@@ -2,6 +2,11 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useUserStore } from "../stores/user.js"
 import HomeView from '../views/HomeView.vue'
 import Login from "../components/auth/Login.vue"
+import ChangePassword from "../components/auth/ChangePassword.vue"
+import Dashboard from "../components/Dashboard.vue"
+import Transaction from "../components/transactions/Transaction.vue"
+import Transactions from "../components/transactions/Transactions.vue"
+
 
 let handlingFirstRoute = true
 
@@ -29,17 +34,17 @@ const router = createRouter({
     {
       path: '/password',
       name: 'ChangePassword',
-      //component: ChangePassword
+      component: ChangePassword
     },
     {
       path: '/dashboard',
       name: 'Dashboard',
-      //component: Dashboard
+      component: Dashboard
     },
     {
-      path: '/tasks',
-      name: 'Tasks',
-      //component: Tasks,
+      path: '/transactions',
+      name: 'Transactions',
+      component: Transactions,
     },
     {
       path: '/tasks/current',
@@ -48,10 +53,10 @@ const router = createRouter({
       //props: { onlyCurrentTasks: true, tasksTitle: 'Current Tasks' }
     },
     {
-      path: '/tasks/new',
-      name: 'NewTask',
-      //component: Task,
-      //props: { id: -1 }
+      path: '/transactions/new',
+      name: 'NewTransaction',
+      component: Transaction,
+      props: { id: -1 }
     },
     {
       path: '/tasks/:id',

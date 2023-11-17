@@ -2,12 +2,12 @@ import axios from 'axios'
 import { ref, computed, inject } from 'vue'
 import { defineStore } from 'pinia'
 import avatarNoneUrl from '@/assets/avatar-none.png'
-import { useProjectsStore } from "./projects.js"
+import { useTransactionsStore } from "./transactions.js"
 
 export const useUserStore = defineStore('user', () => {
 
     const serverBaseUrl = inject('serverBaseUrl')
-    const projectsStore = useProjectsStore()
+    const transactionsStore = useTransactionsStore()
     
     const user = ref(null)
 
@@ -33,7 +33,7 @@ export const useUserStore = defineStore('user', () => {
 
     function clearUser() {
         delete axios.defaults.headers.common.Authorization
-        projectsStore.clearProjects()
+        //transactionsStore.clearTransactions()
         sessionStorage.removeItem('token')
         user.value = null
     }     
@@ -55,7 +55,7 @@ export const useUserStore = defineStore('user', () => {
 
     async function logout () {
         try {
-            await axios.post('logout')
+            await axios.post('logout', sessionStorage.getItem('token'))
             clearUser()
             return true
         } catch (error) {

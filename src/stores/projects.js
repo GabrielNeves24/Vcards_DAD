@@ -3,38 +3,38 @@ import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { useUserStore } from "./user.js"
 
-export const useProjectsStore = defineStore('projects', () => {
+export const useTransactionsStore = defineStore('transations', () => {
     
     const userStore = useUserStore()
 
-    const projects = ref([])
+    const transations = ref([])
 
-    const totalProjects = computed(() => {
-        return projects.value.length
+    const totalTransactions = computed(() => {
+        return transations.value.length
     })
 
-    const myInprogressProjects = computed(() => {        
-        return projects.value.filter( prj => 
-            prj.status == 'W' && prj.responsible_id == userStore.userId)
-    })
+    // const myInprogressTransactions = computed(() => {        
+    //     return transations.value.filter( prj => 
+    //         prj.status == 'W' && prj.responsible_id == userStore.userId)
+    // })
 
-    const totalMyInprogressProjects = computed(() => {     
-        return projects.value.reduce( (acumulador, prj) => 
-            (prj.status == 'W' && prj.responsible_id == userStore.userId)
-                ? acumulador + 1 
-                : acumulador
-            , 0)
-    })
+    // const totalMyInprogressTransactions = computed(() => {     
+    //     return transations.value.reduce( (acumulador, prj) => 
+    //         (prj.status == 'W' && prj.responsible_id == userStore.userId)
+    //             ? acumulador + 1 
+    //             : acumulador
+    //         , 0)
+    // })
 
-    function getProjectsByFilter(responsibleId, status) {
-        return projects.value.filter( prj =>
+    function getTransactionsByFilter(responsibleId, status) {
+        return transations.value.filter( prj =>
             (!responsibleId || responsibleId == prj.responsible_id) &&
             (!status || status == prj.status)
         )
     }
     
-    function getProjectsByFilterTotal(responsibleId, status) {
-        return projects.value.reduce((acumulador, prj) =>
+    function getTransactionsByFilterTotal(responsibleId, status) {
+        return transations.value.reduce((acumulador, prj) =>
             ((!responsibleId || responsibleId == prj.responsible_id) &&
                 (!status || status == prj.status)    )
                 ? acumulador + 1 
@@ -42,17 +42,17 @@ export const useProjectsStore = defineStore('projects', () => {
             , 0)        
     }
 
-    function clearProjects() {
-        projects.value = []
+    function clearTransactions() {
+        transations.value = []
     }
 
-    async function loadProjects() {
+    async function loadTransactions() {
         try {
-            const response = await axios.get('projects')
-            projects.value = response.data.data
-            return projects.value
+            const response = await axios.get(`vcards/${userStore.id}/transations/all`)
+            transations.value = response.data.transactions
+            return transations.value
         } catch (error) {
-            clearProjects()
+            clearTransactions()
             throw error
         }
     }
@@ -60,18 +60,18 @@ export const useProjectsStore = defineStore('projects', () => {
     async function insertProject(newProject) {
         // Note that when an error occours, the exception should be
         // catch by the function that called the insertProject
-        const response = await axios.post('projects', newProject)
-        projects.value.push(response.data.data)
+        const response = await axios.post('transations', newProject)
+        transations.value.push(response.data.data)
         return response.data.data
     }
 
     async function updateProject(updateProject) {
         // Note that when an error occours, the exception should be
         // catch by the function that called the updateProject
-        const response = await axios.put('projects/' + updateProject.id, updateProject)
-        let idx = projects.value.findIndex((t) => t.id === response.data.data.id)
+        const response = await axios.put('transations/' + updateProject.id, updateProject)
+        let idx = transations.value.findIndex((t) => t.id === response.data.data.id)
         if (idx >= 0) {
-            projects.value[idx] = response.data.data
+            transations.value[idx] = response.data.data
         }
         return response.data.data
     }
@@ -79,23 +79,23 @@ export const useProjectsStore = defineStore('projects', () => {
     async function deleteProject( deleteProject) {
         // Note that when an error occours, the exception should be
         // catch by the function that called the deleteProject
-        const response = await axios.delete('projects/' + deleteProject.id)
-        let idx = projects.value.findIndex((t) => t.id === response.data.data.id)
+        const response = await axios.delete('transations/' + deleteProject.id)
+        let idx = transations.value.findIndex((t) => t.id === response.data.data.id)
         if (idx >= 0) {
-            projects.value.splice(idx, 1)
+            transations.value.splice(idx, 1)
         }
         return response.data.data
     }  
     
     return {
-        projects,
-        totalProjects,
-        myInprogressProjects,
-        totalMyInprogressProjects,
-        getProjectsByFilter,
-        getProjectsByFilterTotal, 
-        loadProjects,
-        clearProjects,
+        transations,
+        totalTransactions,
+        //myInprogressTransations,
+        //totalMyInprogressTransations,
+        getTransactionsByFilter,
+        getTransactionsByFilterTotal, 
+        loadTransactions,
+        clearTransactions,
         insertProject,
         updateProject,
         deleteProject

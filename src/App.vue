@@ -2,11 +2,11 @@
 import { useRouter, RouterLink, RouterView } from 'vue-router'
 import { useToast } from "vue-toastification"
 import { useUserStore } from './stores/user.js'
-import { useProjectsStore } from "./stores/projects.js"
+import { useTransactionsStore } from "./stores/transactions.js"
 
 const toast = useToast()
 const userStore = useUserStore()
-const projectsStore = useProjectsStore()
+const transactionsStore = useTransactionsStore()
 const router = useRouter()
 
 const logout = async () => {
@@ -112,12 +112,12 @@ const clickMenuOption = () => {
                 </router-link>
             </li>
             <li class="nav-item d-flex justify-content-between align-items-center pe-3">
-              <router-link class="nav-link w-100 me-3" :class="{ active: $route.name === 'Tasks' }" 
-                          :to="{ name: 'Tasks' }" @click="clickMenuOption">
+              <router-link class="nav-link w-100 me-3" :class="{ active: $route.name === 'Transactions' }" 
+                          :to="{ name: 'Transactions' }" @click="clickMenuOption">
                 <i class="bi bi-list-check"></i>
-                Tasks
+                Transações
               </router-link>
-              <router-link class="link-secondary" :to="{ name: 'NewTask' }" aria-label="Add a new task" @click="clickMenuOption">
+              <router-link class="link-secondary" :to="{ name: 'NewTransaction' }" aria-label="Add a new task" @click="clickMenuOption">
                 <i class="bi bi-xs bi-plus-circle"></i>
               </router-link>
             </li>
@@ -153,7 +153,7 @@ const clickMenuOption = () => {
             </router-link>
           </h6>
           <ul class="nav flex-column mb-2">
-            <li class="nav-item" v-for="prj in projectsStore.myInprogressProjects" :key="prj.id">
+            <li class="nav-item" v-for="prj in transactionsStore.myInprogressTransactions" :key="prj.id">
               <router-link class="nav-link w-100 me-3" 
                 :class="{ active: $route.name == 'ProjectTasks' && $route.params.id == prj.id }"
                 :to="{ name: 'ProjectTasks', params: { id: prj.id } }" @click="clickMenuOption">
