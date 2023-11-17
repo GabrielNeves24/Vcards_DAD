@@ -18,7 +18,7 @@ export const useUserStore = defineStore('user', () => {
   
     const userPhotoUrl = computed(() =>
         user.value?.photo_url 
-        ? serverBaseUrl + '/storage/fotos/' + user.value.photo_url 
+        ? serverBaseUrl + '/storage/fotos/' + user.value.photo_url  
         : avatarNoneUrl)
 
     async function loadUser() {
