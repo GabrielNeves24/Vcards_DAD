@@ -26,7 +26,7 @@ const clickToDeleteUser = (user) => {
         <span style="text-align: left;" >{{ fullDescription }}</span>
         <div class="float-end" v-show="!readonly">
             <button class="btn btn-danger btn-xs" @click="clickToDeleteUser(user)">
-                <i class="bi-trash" aria-hidden="true">Eliminar</i>
+                <i class="bi-trash" aria-hidden="true"></i>
             </button>
         </div>
     </li>

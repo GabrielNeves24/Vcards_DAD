@@ -7,7 +7,12 @@ const props = defineProps({
     fieldName: {
         type: String,
         default: "",
-    }
+    },
+    fieldNumber: {
+        
+    },
+    
+
 })
 </script>
 

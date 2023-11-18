@@ -8,7 +8,7 @@ import Transaction from "../components/transactions/Transaction.vue"
 import Transactions from "../components/transactions/Transactions.vue"
 import Vcards from "../components/vcards/Vcards.vue"
 import Users from "../components/users/Users.vue"
-
+import Categories from "../components/categories/Categories.vue"
 
 let handlingFirstRoute = true
 
@@ -73,11 +73,11 @@ const router = createRouter({
 
 
 
-    // {
-    //   path: '/users',
-    //   name: 'users',
-    //   component: Users,
-    // },
+     {
+       path: '/Categories',
+       name: 'Categories',
+       component: Categories,
+     },
 
 
 

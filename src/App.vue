@@ -3,6 +3,7 @@ import { useRouter, RouterLink, RouterView } from 'vue-router'
 import { useToast } from "vue-toastification"
 import { useUserStore } from './stores/user.js'
 import { useTransactionsStore } from "./stores/transactions.js"
+import { watch } from 'vue';
 
 const toast = useToast()
 const userStore = useUserStore()
@@ -21,6 +22,7 @@ const logout = async () => {
 
 const clickMenuOption = () => {
   const domReference = document.getElementById('buttonSidebarExpandId')
+  console.log(userStore.userType )
   if (domReference) {
     if (window.getComputedStyle(domReference).display !== "none") {
       domReference.click()
@@ -78,6 +80,13 @@ const clickMenuOption = () => {
                 </router-link>
               </li>
               <li>
+                <router-link class="dropdown-item" :class="{ active: $route.name === 'Categories' }" 
+                              :to="{ name: 'Categories' }" @click="clickMenuOption">
+                  <i class="bi bi-key-fill"></i>
+                  Configure Categories
+                </router-link>
+              </li>
+              <li>
                 <hr class="dropdown-divider">
               </li>
               <li>
@@ -104,14 +113,7 @@ const clickMenuOption = () => {
                 Dashboard
               </router-link> 
             </li>
-            <li class="nav-item">
-                <router-link class="nav-link" :class="{ active: $route.name === 'CurrentTasks' }" 
-                            :to="{ name: 'CurrentTasks' }" @click="clickMenuOption">
-                  <i class="bi bi-list-stars"></i>
-                  Current Tasks
-                </router-link>
-            </li>
-            <li class="nav-item d-flex justify-content-between align-items-center pe-3">
+            <li class="nav-item d-flex justify-content-between align-items-center pe-3" v-show="userStore.userType=='V'">
               <router-link class="nav-link w-100 me-3" :class="{ active: $route.name === 'Transactions' }" 
                           :to="{ name: 'Transactions' }" @click="clickMenuOption">
                 <i class="bi bi-list-check"></i>
@@ -121,14 +123,14 @@ const clickMenuOption = () => {
                 <i class="bi bi-xs bi-plus-circle"></i>
               </router-link>
             </li>
-            <li class="nav-item">
+            <li v-show="userStore.userType ==='A'" class="nav-item">
                 <router-link class="nav-link" :class="{ active: $route.name === 'Vcards' }" 
                             :to="{ name: 'Vcards' }" @click="clickMenuOption">
                   <i class="bi bi-files"></i>
                     Gestão VCards
                 </router-link>
             </li>
-            <li class="nav-item">
+            <li class="nav-item" v-show="userStore.userType == 'A' " >
                 <router-link class="nav-link" :class="{ active: $route.name === 'Users' }" 
                             :to="{ name: 'Users' }" @click="clickMenuOption">
                   <i class="bi bi-files"></i>
@@ -142,7 +144,7 @@ const clickMenuOption = () => {
                     Team Members
                 </router-link>
             </li> -->
-            <li class="nav-item" v-show="userStore.user?.type == 'A'">
+            <li class="nav-item" v-show="userStore.userType == 'A'">
             <router-link class="nav-link" 
               :class="{ active: $route.name === 'Reports' }"
               :to="{ name: 'Reports' }" @click="clickMenuOption">
@@ -152,23 +154,7 @@ const clickMenuOption = () => {
             </li>
           </ul>
 
-          <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted" v-if="userStore.user">
-            <span>My Projects</span>
-            <router-link
-              class="link-secondary" :to="{ name: 'NewProject' }" aria-label="Add a new project" @click="clickMenuOption">
-              <i class="bi bi-xs bi-plus-circle"></i>
-            </router-link>
-          </h6>
-          <ul class="nav flex-column mb-2">
-            <li class="nav-item" v-for="prj in transactionsStore.myInprogressTransactions" :key="prj.id">
-              <router-link class="nav-link w-100 me-3" 
-                :class="{ active: $route.name == 'ProjectTasks' && $route.params.id == prj.id }"
-                :to="{ name: 'ProjectTasks', params: { id: prj.id } }" @click="clickMenuOption">
-                <i class="bi bi-file-ruled"></i>
-                {{ prj.name }}
-              </router-link>
-            </li>
-          </ul>
+        
 
           <div class="d-block d-md-none">
             <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">

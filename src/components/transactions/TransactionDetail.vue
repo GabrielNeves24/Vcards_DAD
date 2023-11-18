@@ -1,6 +1,12 @@
 <script setup>
-  import { ref, watch, computed } from 'vue'
+  import { ref, watch, computed, onMounted } from 'vue'
+  import axios from 'axios'
+  import { useToast } from 'vue-toastification'
+  import { defineProps, defineEmits } from 'vue'
+  import { useUserStore } from "../../stores/user.js"
 
+  const toast = useToast()
+const userStore = useUserStore()
   const props = defineProps({
     transaction: {
       type: Object,
@@ -45,7 +51,7 @@
     { immediate: true }
   )
 
-  const taskTitle = computed( () => {
+  const transactionTitle = computed( () => {
     if (!editingTransaction.value) {
         return ''
       }
@@ -59,6 +65,21 @@
   const cancel = () => {
     emit('cancel', editingTransaction.value)
   }
+
+  const categories = ref([])
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get('vcards/'+ userStore.userId +'/categories/debit')
+      categories.value = response.data.data
+      console.log(response.data.data);
+    } catch (error) {
+      toast.error('Error fetching categories!')
+    }
+  }
+
+  onMounted(() => {
+    fetchCategories()
+  })
 </script>
 
 <template>
@@ -67,100 +88,91 @@
     novalidate
     @submit.prevent="save"
   >
-    <h3 class="mt-5 mb-3">{{ taskTitle }}</h3>
+    <h3 class="mt-5 mb-3">{{ transactionTitle }}</h3>
     <hr>
-
-    <div class="d-flex flex-wrap justify-content-between">
-      <div class="mb-3 checkCompleted">
-        <div class="form-check">
-          <input
-            class="form-check-input"
-            :class="{ 'is-invalid': errors ? errors['completed'] : false }"
-            type="checkbox"
-            v-model="editingTransaction.completed"
-            id="inputCompleted"
-          >
-          <label
-            class="form-check-label"
-            for="inputCompleted"
-          >
-            Task is Completed
-          </label>
-          <field-error-message :errors="errors" fieldName="completed"></field-error-message>
-        </div>
-      </div>
-      <div
-        class="row mb-3 total_hours"
-        v-show="editingTransaction.completed"
-      >
-        <label
-          for="inputHours"
-          class="col-sm-2 col-form-label"
-        >Hours</label>
-        <div class="col-sm-10">
-          <input
-            type="number"
-            class="form-control"
-            :class="{ 'is-invalid': errors ? errors['total_hours'] : false }"
-            id="inputHours"
-            placeholder="Total hours to complete the task"
-            v-model="editingTransaction.total_hours"
-          >
-          <field-error-message :errors="errors" fieldName="total_hours"></field-error-message>
-        </div>
-      </div>
-    </div>
 
     <div class="mb-3">
       <label
-        for="inputDescription"
+        for="value"
         class="form-label"
-      >Description</label>
+      >Valor:</label>
+      <input
+        type="number"
+        class="form-control"
+        :class="{'is-invalid': errors ? errors['value']: false}"
+        id="value"
+        placeholder="Valor da Transação"
+        required
+        v-model="editingTransaction.value" min="0.01" step="0.01"
+      >
+      <field-error-message :errors="errors" fieldNumber="value"></field-error-message>
+    </div>
+    <div class="mb-3">
+      <label
+        for="payment_type"
+        class="form-label"
+      >Tipo Transação</label>
+      <select
+        class="form-select"
+        :class="{ 'is-invalid': errors ? errors['payment_type'] : false }"
+        id="payment_type"
+        v-model="editingTransaction.payment_type"
+      >
+          <option value="VCARD" >vCard</option>
+          <option value="MBWAY">MBWAY</option>
+          <option value="PAYPAL">PayPal</option>
+          <option value="IBAN">IBAN (Bank Transfer)</option>
+          <option value="MB">MB (Multibanco)</option>
+          <option value="VISA">Visa</option>
+      </select>
+      <field-error-message :errors="errors" fieldName="payment_type"></field-error-message>
+    </div>
+    <div class="mb-3">
+      <label
+        for="category_id"
+        class="form-label"
+      >Categoria Transação</label>
+      <select
+        class="form-select"
+        :class="{ 'is-invalid': errors ? errors['category_id'] : false }"
+        id="category_id"
+        v-model="editingTransaction.category_id"
+      >
+          <option v-for="category in categories" :key="category.id" :value="category.id">
+            {{ category.name }}
+          </option>
+      </select>
+      <field-error-message :errors="errors" fieldName="category_id"></field-error-message>
+    </div>
+    <div class="mb-3">
+      <label
+        for="payment_reference"
+        class="form-label"
+      >Referencia</label>
       <input
         type="text"
         class="form-control"
-        :class="{'is-invalid': errors ? errors['description']: false}"
-        id="inputDescription"
-        placeholder="Task Description"
+        :class="{'is-invalid': errors ? errors['payment_reference']: false}"
+        id="payment_reference"
+        placeholder="Referencia da Transação"
         required
-        v-model="editingTransaction.description"
+        v-model="editingTransaction.payment_reference"
       >
-      <field-error-message :errors="errors" fieldName="description"></field-error-message>
+      <field-error-message :errors="errors" fieldName="payment_reference"></field-error-message>
     </div>
     <div class="mb-3">
       <label
-        for="inputProject"
+        for="description"
         class="form-label"
-      >Project</label>
-      <select
-        class="form-select"
-        :class="{ 'is-invalid': errors ? errors['transaction_id'] : false }"
-        id="inputProject"
-        :disabled="fixedProject"
-        v-model="editingTransaction.transaction_id"
-      >
-        <option :value="null">-- No Project --</option>
-        <option
-          v-for="prj in projects"
-          :key="prj.id"
-          :value="prj.id"
-        >{{prj.name}}</option>
-      </select>
-      <field-error-message :errors="errors" fieldName="transaction_id"></field-error-message>
-    </div>
-    <div class="mb-3">
-      <label
-        for="inputNotes"
-        class="form-label"
-      >Notes</label>
+      >Descrição</label>
       <textarea
         class="form-control"
-        :class="{ 'is-invalid': errors ? errors['notes'] : false }"
-        id="inputNotes"
+        :class="{ 'is-invalid': errors ? errors['description'] : false }"
+        id="description"
         rows="4"
-        v-model="editingTransaction.notes"
+        v-model="editingTransaction.description"
       ></textarea>
-      <field-error-message :errors="errors" fieldName="notes"></field-error-message>
+      <field-error-message :errors="errors" fieldName="description"></field-error-message>
     </div>
 
     <div class="mb-3 d-flex justify-content-end">
@@ -168,12 +180,12 @@
         type="button"
         class="btn btn-primary px-5"
         @click="save"
-      >Save</button>
+      >Efetuar Transação</button>
       <button
         type="button"
         class="btn btn-light px-5"
         @click="cancel"
-      >Cancel</button>
+      >Cancelar</button>
     </div>
   </form>
 </template>

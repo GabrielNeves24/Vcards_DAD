@@ -41,14 +41,18 @@ const closeEdit = () => {
     <li class="list-group-item" :class="{'bg-light': readonly}">
         <span style="text-align: left;" >{{ fullDescription }}</span>
         <div class="float-end" v-show="!readonly">
+            
+            <button
+              class="btn btn-xs btn-light"
+              @click="editVcard(vcard)" v-if="!vcardEdit"
+              >
+              <i class="bi bi-xs bi-pencil"></i>
+            </button>
+            <button class="btn btn-xs btn-light" @click="closeEdit" v-else>
+                <i class="bi bi-xs bi-pencil" aria-hidden="true"></i>
+            </button>
             <button class="btn btn-danger btn-xs" @click="clickToDeleteVcard(vcard)">
-                <i class="bi-trash" aria-hidden="true">Eliminar</i>
-            </button>
-            <button class="btn btn-info btn-xs" @click="editVcard(vcard)" v-if="!vcardEdit">
-                <i class="bi-pencil" aria-hidden="true">Editar</i>
-            </button>
-            <button class="btn btn-warning btn-xs" @click="closeEdit" v-else>
-                <i class="bi-arrow-up" aria-hidden="true">Editando</i>
+                <i class="bi-trash" aria-hidden="true"></i>
             </button>
         </div>
         <div v-if="vcardEdit">

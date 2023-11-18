@@ -4,9 +4,12 @@ import { useRouter } from 'vue-router'
 import { useUserStore } from "../../stores/user.js"
 import { ref, computed, onMounted } from 'vue'
 import VcardList from "./VcardList.vue"
+import { useToast } from "vue-toastification"
 
 const router = useRouter()
 const userStore = useUserStore()
+
+const toast = useToast()
 
 const loadVcards = async () => {
   try {
@@ -21,15 +24,32 @@ const loadVcards = async () => {
 //     router.push({ name: 'NewTransaction' })
 // }
 
-const editVcard = (vcard) => {
-    router.push({ name: 'Vcard', params: { id: vcard.id } })
+const editVcard = async (vcard) => {
+  try{
+        // update the API
+        const response = await axios.put(`/vcards/user/${vcard.phone_number}`, vcard);
+        // update the local copy of the data
+        console.log(response.data.data)
+        toast.success('Dados atualizados com sucesso!')
+        loadVcards()
+    } catch (error) {
+      toast.error('Erro ao atualizar os dados!')
+    }
+
 }
 
-const deletedVcard = (deletedVcard) => {
-    let idx = vcards.value.findIndex((t) => t.id === deletedVcard.id)
-    if (idx >= 0) {
-        vcards.value.splice(idx, 1)
-    }
+const deletedVcard =async  (deletedVcard) => {
+      try {
+        // delete from the API
+        const responseDelete = await axios.delete(`/vcards/${deletedVcard.phone_number}`, deletedVcard);
+        // delete from the local array
+        // Show a success alert
+        toast.sucess(responseDelete.data.message);
+        
+        } catch (error) {
+          toast.error("erro ao eliminar o vcard");
+            console.error('Erro ao obter vcards:', error);
+        }    
 }
 
 const props = defineProps({
@@ -78,12 +98,20 @@ const totalTransactions = computed( () => {
 })
 
 
+
 onMounted (() => {
   loadVcards()
 })
 </script>
 
 <template>
+     <confirmation-dialog
+    ref="deleteConfirmationDialog"
+    confirmationBtn="Delete vcard"
+    :msg="`Do you really want to delete the vcard?`"
+    @confirmed="deleteTransactionConfirmed"
+  >
+  </confirmation-dialog>
   <div class="d-flex justify-content-between">
     <div class="mx-2">
       <h3 class="mt-4">{{ vcardsTitle }}</h3>
@@ -143,8 +171,8 @@ onMounted (() => {
     :vcards="vcards"
     :showId="true"
     :showOwner="false"
-    @edit="editVcard"
-    @deleted="deletedVcard"
+    @requestUpdateVcard="editVcard"
+    @requestRemoveFromListVcard="deletedVcard"
   ></VcardList>
 </template>
 

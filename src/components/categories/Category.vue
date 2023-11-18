@@ -2,47 +2,42 @@
 import axios from 'axios'
 import { useToast } from "vue-toastification"
 import { useUserStore } from "../../stores/user.js"
-import { useTransactionsStore } from "../../stores/transactions.js"
+//import { useTransactionsStore } from "../../stores/transactions.js"
 import { useRouter, onBeforeRouteLeave } from 'vue-router'
 import { ref, watch, computed } from 'vue'
 
-import TransactionDetail from "./TransactionDetail.vue"
+import CategoryDetail from "./CategoryDetail.vue"
 
 const toast = useToast()
 const router = useRouter()
 const userStore = useUserStore()
-const transactionStore = useTransactionsStore()
+//const transactionStore = useTransactionsStore()
 
-const newTransaction = () => { 
+const newCategory = () => { 
   return {
     id: null,
-    vcard: userStore.userId,
-    type: 'D',
-    value: null,
-    payment_type: null,
-    payment_reference: null,
-    category_id: null,
+    type: null,
     description: null,
   }
 }
 
-const transaction = ref(newTransaction())
+const category = ref(newCategory())
 const errors = ref(null)
 const confirmationLeaveDialog = ref(null)
 // String with the JSON representation after loading the project (new or edit)
 let originalValueStr = ''
   
-const loadTask = async (id) => {
+const loadCategories = async (id) => {
   originalValueStr = ''
   errors.value = null
   if (!id || (id < 0)) {
-    transaction.value = newTransaction()
-    originalValueStr = JSON.stringify(transaction.value)
+    category.value = newCategory()
+    originalValueStr = JSON.stringify(category.value)
   } else {
       try {
-        const response = await axios.get('vcards/' + id + '/transactions/all')
-        transaction.value = response.data.data
-        originalValueStr = JSON.stringify(transaction.value)
+        const response = await axios.get('vcards/' + userStore.$id + '/categories')
+        category.value = response.data.data
+        originalValueStr = JSON.stringify(category.value)
       } catch (error) {
         console.log(error)
       }
@@ -53,12 +48,10 @@ const save = async () => {
   errors.value = null
   if (operation.value == 'insert') {
     try {
-      console.log(transaction.value)
-      const response = await axios.post('transactions/debit', transaction.value)
-      transaction.value = response.data.data
-      //console.log(transaction.value)
-      originalValueStr = 1;//JSON.stringify(transaction.value)
-      toast.success('Transação criada com sucesso!')
+      const response = await axios.post('transactions/debit', category.value)
+      category.value = response.data.data
+      originalValueStr = JSON.stringify(category.value)
+      toast.success('Transação #' + category.value.id + ' was created successfully.')
       router.back()
     } catch (error) {
       if (error.response.status == 422) {
@@ -70,10 +63,10 @@ const save = async () => {
     }
   } else {
     try {
-      const response = await axios.put('transactions/debit' + props.id, transaction.value)
-      transaction.value = response.data.data
-      originalValueStr = JSON.stringify(transaction.value)
-      toast.success('Transação #' + transaction.value.id + ' was updated successfully.')
+      const response = await axios.put('transactions/debit' + props.id, category.value)
+      category.value = response.data.data
+      originalValueStr = JSON.stringify(category.value)
+      toast.success('Transação #' + category.value.id + ' was updated successfully.')
       router.back()
     } catch (error) {
       if (error.response.status == 422) {
@@ -87,7 +80,7 @@ const save = async () => {
 }
 
 const cancel = () => {
-  originalValueStr = JSON.stringify(transaction.value)
+  originalValueStr = JSON.stringify(category.value)
   router.back()
 }
 
@@ -110,7 +103,7 @@ const operation = computed( () => (!props.id || props.id < 0) ? 'insert' : 'upda
 watch(
   () => props.id,
   (newValue) => {
-      loadTask(newValue)
+      loadCategories(newValue)
     }, 
   { immediate: true}
 )
@@ -124,7 +117,7 @@ const leaveConfirmed = () => {
 
 onBeforeRouteLeave((to, from, next) => {
   nextCallBack = null
-  let newValueStr = originalValueStr
+  let newValueStr = JSON.stringify(category.value)
   if (originalValueStr != newValueStr) {
     // Some value has changed - only leave after confirmation
     nextCallBack = next
@@ -146,13 +139,13 @@ onBeforeRouteLeave((to, from, next) => {
   >
   </confirmation-dialog>  
 
-  <transaction-detail
+  <category-detail
     :operationType="operation"
-    :transaction="transaction"
-    :transactions="transactionStore.transactions"
-    :fixedTransaction="fixedTransaction"
+    :category="category"
+    :categories="categories"
+    :fixedTransaction="fixedCategory"
     :errors="errors"
     @save="save"
     @cancel="cancel"
-  ></transaction-detail>
+  ></category-detail>
 </template>

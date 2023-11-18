@@ -86,6 +86,7 @@ export const useUserStore = defineStore('user', () => {
         clearUser,
         login,
         logout,
-        restoreToken
+        restoreToken,
+        userType,
     }
 })
