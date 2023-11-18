@@ -6,6 +6,8 @@ import ChangePassword from "../components/auth/ChangePassword.vue"
 import Dashboard from "../components/Dashboard.vue"
 import Transaction from "../components/transactions/Transaction.vue"
 import Transactions from "../components/transactions/Transactions.vue"
+import Vcards from "../components/vcards/Vcards.vue"
+import Users from "../components/users/Users.vue"
 
 
 let handlingFirstRoute = true
@@ -59,6 +61,30 @@ const router = createRouter({
       props: { id: -1 }
     },
     {
+      path: '/vcards',
+      name: 'Vcards',
+      component: Vcards,
+    },
+
+
+
+
+
+
+
+
+    // {
+    //   path: '/users',
+    //   name: 'users',
+    //   component: Users,
+    // },
+
+
+
+
+
+
+    {
       path: '/tasks/:id',
       name: 'Task',
       //component: Task,
@@ -85,7 +111,7 @@ const router = createRouter({
     {
       path: '/users',
       name: 'Users',
-      //component: Users,
+      component: Users,
     },
     {
       path: '/users/:id',
