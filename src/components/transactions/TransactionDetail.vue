@@ -55,7 +55,7 @@ const userStore = useUserStore()
     if (!editingTransaction.value) {
         return ''
       }
-      return props.operationType == 'insert' ? 'New Task' : 'Task #' + editingTransaction.value.id
+      return props.operationType == 'insert' ? 'Nova Transação' : 'Transação ' + editingTransaction.value.id
   })
 
   const save = () => {

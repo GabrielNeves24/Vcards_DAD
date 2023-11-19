@@ -17,7 +17,8 @@ const newCategory = () => {
   return {
     id: null,
     type: null,
-    description: null,
+    name: null,
+    vcard: userStore.userId
   }
 }
 
@@ -48,22 +49,22 @@ const save = async () => {
   errors.value = null
   if (operation.value == 'insert') {
     try {
-      const response = await axios.post('transactions/debit', category.value)
+      const response = await axios.post('vcards/'+ userStore.userId + '/categories', category.value)
       category.value = response.data.data
       originalValueStr = JSON.stringify(category.value)
-      toast.success('Transação #' + category.value.id + ' was created successfully.')
+      toast.success('Catergoria #' + category.value.id + ' criada com sucesso')
       router.back()
     } catch (error) {
       if (error.response.status == 422) {
         errors.value = error.response.data.errors
-        toast.error('Transação was not created due to validation errors!')
+        toast.error('Catergoria was not created due to validation errors!')
       } else {
-        toast.error('Transação was not created due to unknown server error!')
+        toast.error('Catergoria was not created due to unknown server error!')
       }
     }
   } else {
     try {
-      const response = await axios.put('transactions/debit' + props.id, category.value)
+      const response = await axios.put('vcards/'+ userStore.userId + 'categories', category.value)
       category.value = response.data.data
       originalValueStr = JSON.stringify(category.value)
       toast.success('Transação #' + category.value.id + ' was updated successfully.')
@@ -89,7 +90,7 @@ const props = defineProps({
     type: Number,
     default: null
   },
-  fixedTransaction: {
+  fixedCategory: {
     type: Number,
     default: null
   }

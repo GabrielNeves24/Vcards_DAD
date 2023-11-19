@@ -37,6 +37,7 @@ export const useUserStore = defineStore('user', () => {
         delete axios.defaults.headers.common.Authorization
         //transactionsStore.clearTransactions()
         sessionStorage.removeItem('token')
+        
         user.value = null
     }     
 
@@ -46,6 +47,18 @@ export const useUserStore = defineStore('user', () => {
             axios.defaults.headers.common.Authorization = "Bearer " + response.data.access_token
             sessionStorage.setItem('token', response.data.access_token)
             await loadUser()
+            //await projectsStore.loadProjects()
+            return true       
+        } 
+        catch(error) {
+            clearUser()            
+            return false
+        }
+    } 
+
+    async function register(credentialsRegister) {
+        try {
+            const response = await axios.post('register', credentialsRegister)
             //await projectsStore.loadProjects()
             return true       
         } 
@@ -85,6 +98,7 @@ export const useUserStore = defineStore('user', () => {
         loadUser,
         clearUser,
         login,
+        register,
         logout,
         restoreToken,
         userType,

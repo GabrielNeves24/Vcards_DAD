@@ -36,7 +36,7 @@ const clickMenuOption = () => {
     <div class="container-fluid">
       <router-link class="navbar-brand col-md-3 col-lg-2 me-0 px-3" :to="{ name: 'home' }" @click="clickMenuOption"> 
         <img src="@/assets/logo.svg" alt="" width="30" height="24" class="d-inline-block align-text-top">
-        App name
+        Vcards Website
       </router-link> 
       <button id="buttonSidebarExpandId" class="navbar-toggler" type="button" data-bs-toggle="collapse"
         data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
@@ -46,9 +46,11 @@ const clickMenuOption = () => {
       <div class="collapse navbar-collapse justify-content-end">
         <ul class="navbar-nav">
           <li class="nav-item" v-show="!userStore.user">
-            <a class="nav-link" href="#"><i class="bi bi-person-check-fill"></i>
+            <router-link class="nav-link" :class="{ active: $route.name === 'Register' }" 
+                          :to="{ name: 'Register' }" @click="clickMenuOption">
+              <i class="bi bi-box-arrow-in-right"></i>
               Register
-            </a>
+            </router-link>
           </li>
           <li class="nav-item" v-show="!userStore.user">
             <router-link class="nav-link" :class="{ active: $route.name === 'Login' }" 
@@ -162,9 +164,11 @@ const clickMenuOption = () => {
             </h6>
             <ul class="nav flex-column mb-2">
               <li class="nav-item" v-show="!userStore.user">
-                <a class="nav-link" href="#"><i class="bi bi-person-check-fill"></i>
+                <router-link class="nav-link" :class="{ active: $route.name === 'Register' }" 
+                              :to="{ name: 'Register' }" @click="clickMenuOption">
+                  <i class="bi bi-box-arrow-in-right"></i>
                   Register
-                </a>
+                </router-link>
               </li>
               <li class="nav-item" v-show="!userStore.user">
                 <router-link class="nav-link" :class="{ active: $route.name === 'Login' }" 

@@ -29,14 +29,11 @@
   const editingCategory = ref(props.category)
 
   watch(
-    () => props.category,
-    (newCategory) => {
-      editingCategory.value =     (newCategory) => {
-        editingCategory.value = newCategory
-      }
-
-    }
-  )
+  () => props.category,
+  (newCategory) => {
+    editingCategory.value = newCategory;
+  }
+);
 
   watch(
     () => props.fixedCategory, 
@@ -52,7 +49,7 @@
     if (!editingCategory.value) {
         return ''
       }
-      return props.operationType == 'insert' ? 'Nona Categoria' : 'Categoria #' + editingCategory.value.id
+      return props.operationType == 'insert' ? 'Nova Categoria' : 'Categoria #' + editingCategory.value.id
   })
 
   const save = () => {
@@ -75,17 +72,34 @@
 
     <div class="mb-3">
       <label
-        for="inputName"
+        for="type"
         class="form-label"
-      >Name</label>
+      >Tipo</label>
+      <select
+        class="form-select"
+        :class="{ 'is-invalid': errors ? errors['payment_type'] : false }"
+        id="payment_type"
+        v-model="editingCategory.type"
+        required
+      >
+        <option value="D">Debit</option>
+        <option value="C">Credit</option>
+      </select>
+      <field-error-message :errors="errors" fieldName="type"></field-error-message>
+    </div>
+    <div class="mb-3">
+      <label
+        for="name"
+        class="form-label"
+      >name</label>
       <input
         type="text"
         class="form-control"
         :class="{'is-invalid': errors ? errors['name']: false}"
-        id="inputName"
-        placeholder="Categoria Name"
+        id="name"
+        placeholder="name"
         required
-        v-model="editingTransaction.name"
+        v-model="editingCategory.name"
       >
       <field-error-message :errors="errors" fieldName="name"></field-error-message>
     </div>

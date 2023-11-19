@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useUserStore } from "../stores/user.js"
 import HomeView from '../views/HomeView.vue'
 import Login from "../components/auth/Login.vue"
+import Register from "../components/auth/Register.vue"
 import ChangePassword from "../components/auth/ChangePassword.vue"
 import Dashboard from "../components/Dashboard.vue"
 import Transaction from "../components/transactions/Transaction.vue"
@@ -9,6 +10,7 @@ import Transactions from "../components/transactions/Transactions.vue"
 import Vcards from "../components/vcards/Vcards.vue"
 import Users from "../components/users/Users.vue"
 import Categories from "../components/categories/Categories.vue"
+import Category from "../components/categories/Category.vue"
 
 let handlingFirstRoute = true
 
@@ -32,6 +34,11 @@ const router = createRouter({
       path: '/login',
       name: 'Login',
       component: Login
+    },
+    {
+      path: '/register',
+      name: 'Register',
+      component: Register
     },
     {
       path: '/password',
@@ -96,10 +103,10 @@ const router = createRouter({
       //component: Projects,
     },
     {
-      path: '/projects/new',
-      name: 'NewProject',
-      //component: Project,
-      //props: { id: -1 }
+      path: '/categorioes/new',
+      name: 'NewCategory',
+      component: Category,
+      props: { id: -1 }
     },
     {
       path: '/projects/:id',
@@ -147,7 +154,7 @@ router.beforeEach(async (to, from, next) => {
     handlingFirstRoute = false
     await userStore.restoreToken()
   }
-  if ((to.name == 'Login') || (to.name == 'home')) {
+  if ((to.name == 'Login') || (to.name == 'Register') || (to.name == 'home')) {
     next()
     return
   }

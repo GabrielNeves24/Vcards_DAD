@@ -5,6 +5,9 @@ import axios from 'axios'
 import { useToast } from "vue-toastification"
 import { useRouter } from 'vue-router'
 import { useUserStore } from '../stores/user.js'
+import RecentTransactions from '../components/transactions/RecentTransactions.vue';
+import SpendingChart from '../components/transactions/SpendingChart.vue'
+
 
 const toast = useToast()
 const router = useRouter()
@@ -20,15 +23,15 @@ const loadVcard = async () => {
     const response = await axios.get('vcards/' + userStore.userId)
     vcards.value = response.data.data
     console.log(vcards.value)
-    console.log(vcards.value.name)
-    console.log(vcards.value.balance)
   } catch (error) {
+    errors.value = "Failed to load data"; // Set error message
     console.log(error)
   }
 }
 
 onMounted(() => {
   loadVcard()
+  console.log(vcards.value)
 })
 
 </script>
@@ -36,7 +39,7 @@ onMounted(() => {
 <template>
     <section class="dashboard-content">
       <div class="vcard-section">
-        <h2 class="section-title">Saldo {{ vcards.balance }} €</h2>
+        <h2 class="section-title">Saldo {{ vcards?.balance }} €</h2>
         <div class="vcard-list">
           <div class="vcard">
             <!-- Add more card details here -->
@@ -49,7 +52,7 @@ onMounted(() => {
         <h2 class="section-title">Transações</h2>
         <div class="vcard-list">
           <div class="vcard">
-            
+            <SpendingChart />
             <!-- Add more card details here -->
           </div>
         </div>
@@ -58,11 +61,12 @@ onMounted(() => {
         <h2 class="section-title">Transações recentes</h2>
         <div class="vcard-list">
           <div class="vcard">
-            
+            <RecentTransactions />
             <!-- Add more card details here -->
           </div>
         </div>
       </div>
+      <div v-if="errors">{{ errors }}</div>
     </section>
 </template>
 
