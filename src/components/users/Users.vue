@@ -33,9 +33,9 @@ const deletedUser = (deletedUser) => {
 }
 
 const props = defineProps({
-UsersTitle: {
+  usersTitle: {
     type: String,
-    default: 'Users'
+    default: 'Users Manager'
   },
   onlyCurrentUsers: {
     type: Boolean,
@@ -44,37 +44,41 @@ UsersTitle: {
 })
 
 const users = ref([])
-const filterByVcardsId = ref(-1)
-const filterByCompleted = ref(-1)
+  const filterByName = ref('')
+  const currentPage = ref(1);
 
-const filteredUsers = computed( () => {
-  return users.value.filter(t =>
-      (props.onlyCurrentTasks && !t.completed)
-      ||
-      (!props.onlyCurrentTasks && (
-        (filterByVcardsId.value == -1
-          || filterByVcardsId.value == t.transaction_id
-        ) &&
-        (filterByCompleted.value == -1
-          || filterByCompleted.value == 0 && !t.completed
-          || filterByCompleted.value == 1 && t.completed
-        ))))
+  const filteredVcards = computed( () => {
+    let filtered = users.value;
+    if (filterByName.value) {
+      //filter y phone_number or by name
+      filtered = filtered.filter(v =>
+        v.name && v.name.toString().includes(filterByName.value)
+      );
+    }
 
-})
+
+  const totalFiltered = filtered.length;
+  const start = (currentPage.value - 1) * itemsPerPage;
+  const end = Math.min(start + itemsPerPage, totalFiltered);
+  return filtered.slice(start, end);
+  })
+  const itemsPerPage = 10;
+
+  const totalPageCount = computed(() => {
+  return Math.ceil(users.value.length / itemsPerPage);
+});
+
+const updatePage = (direction) => {
+  if (direction === 'prev' && currentPage.value > 1) {
+    currentPage.value--;
+  } else if (direction === 'next' && currentPage.value < totalPageCount.value) {
+    currentPage.value++;
+    totalPageCount.value = Math.ceil(users.value.length / itemsPerPage);
+  }
+};
 
 const totalUsers = computed( () => {
-  return users.value.reduce((c, t) =>
-      (props.onlyCurrentTasks && !t.completed)
-        ||
-        (!props.onlyCurrentTasks && (
-          (filterByVcardsId.value == -1
-            || filterByVcardsId.value == t.project_id
-          ) &&
-          (filterByCompleted.value == -1
-            || filterByCompleted.value == 0 && !t.completed
-            || filterByCompleted.value == 1 && t.completed
-          ))) ? c + 1 : c, 0)
-  
+  return users.value.length; 
 })
 
 
@@ -93,44 +97,21 @@ onMounted (() => {
     </div>
   </div>
   <hr>
+  <h2>Filtros</h2>
   <div
     v-if="!onlyCurrentVcards"
     class="mb-3 d-flex justify-content-between flex-wrap"
   >
-    <div class="mx-2 mt-2 flex-grow-1 filter-div">
-      <label
-        for="selectCompleted"
-        class="form-label"
-      >Filter by completed:</label>
-      <select
-        class="form-select"
-        id="selectCompleted"
-        v-model="filterByCompleted"
-      >
-        <option value="-1">Any</option>
-        <option value="0">Pending Tasks</option>
-        <option value="1">Completed Tasks</option>
-      </select>
-    </div>
-    <div class="mx-2 mt-2 flex-grow-1 filter-div">
-      <label
-        for="selectProject"
-        class="form-label"
-      >Filter by User:</label>
-      <select
-        class="form-select"
-        id="selectProject"
-        v-model="filterByUserId"
-      >
-        <!-- <option value="-1">Any</option>
-        <option :value="null">-- No project --</option>
-        <option
-          v-for="trs in transactionsStore.vcards"
-          :key="trs.id"
-          :value="trs.id"
-        >{{trs.name}}</option> -->
-      </select>
-    </div>
+    
+      <div class="mx-2 mt-2 flex-grow-1 filter-div">
+        <label
+          for="name"
+          class="form-label"
+        >Nome utilizador</label>
+        <input class="form-control"
+          id="name" v-model="filterByName">
+      </div>
+
     <!-- <div class="mx-2 mt-2">
       <button
         type="button"
@@ -140,12 +121,17 @@ onMounted (() => {
     </div> -->
   </div>
   <UserList
-    :users="users"
+    :users="filteredVcards"
     :showId="true"
     :showOwner="false"
     @edit="editUser"
     @deleted="deletedUser"
   ></UserList>
+  <div class="pagination-controls">
+    <button class="btn-pagination" @click="updatePage('prev')">Previous</button>
+    <span>Page {{ currentPage }} of {{ totalPageCount }}</span>
+    <button class="btn-pagination" @click="updatePage('next')">Next</button>
+  </div>
 </template>
 
 
@@ -158,5 +144,11 @@ onMounted (() => {
 }
 .btn-addtask {
   margin-top: 1.85rem;
+}
+
+.pagination-controls {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1em;
 }
 </style>

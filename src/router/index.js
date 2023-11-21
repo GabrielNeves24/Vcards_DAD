@@ -11,6 +11,10 @@ import Vcards from "../components/vcards/Vcards.vue"
 import Users from "../components/users/Users.vue"
 import Categories from "../components/categories/Categories.vue"
 import Category from "../components/categories/Category.vue"
+import Profile from "../components/auth/Profile.vue"
+import TransactionsAll from "../components/transactions/TransactionsAll.vue"
+import NewTransactionCredit from "../components/transactions/TransactionCredit.vue"
+import DashboardAdmin from "../components/DashboardAdmin.vue"
 
 let handlingFirstRoute = true
 
@@ -46,14 +50,29 @@ const router = createRouter({
       component: ChangePassword
     },
     {
+      path: '/profile',
+      name: 'Profile',
+      component: Profile
+    },
+    {
       path: '/dashboard',
       name: 'Dashboard',
       component: Dashboard
     },
     {
+      path: '/dashboard/admin',
+      name: 'DashboardAdmin',
+      component: DashboardAdmin
+    },
+    {
       path: '/transactions',
       name: 'Transactions',
       component: Transactions,
+    },
+    {
+      path: '/transactions/all',
+      name: 'TransactionsAll',
+      component: TransactionsAll,
     },
     {
       path: '/tasks/current',
@@ -65,6 +84,12 @@ const router = createRouter({
       path: '/transactions/new',
       name: 'NewTransaction',
       component: Transaction,
+      props: { id: -1 }
+    },
+    {
+      path: '/transactions/credit/new',
+      name: 'NewTransactionCredit',
+      component: NewTransactionCredit,
       props: { id: -1 }
     },
     {

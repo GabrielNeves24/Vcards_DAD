@@ -44,6 +44,7 @@ export const useUserStore = defineStore('user', () => {
     async function login(credentials) {
         try {
             const response = await axios.post('login', credentials)
+            console.log(response.data.access_token)
             axios.defaults.headers.common.Authorization = "Bearer " + response.data.access_token
             sessionStorage.setItem('token', response.data.access_token)
             await loadUser()
@@ -67,6 +68,43 @@ export const useUserStore = defineStore('user', () => {
             return false
         }
     } 
+
+    async function profile(credentialsProfile) {
+        try {
+            if(userType.value == 'A'){
+                try{
+                    const response = await axios.put('users/' + userId.value, credentialsProfile);
+                }catch(error){
+                    return false;
+                }
+            }else{
+                try{
+                    const response = await axios.put('vcards/' + userId.value, credentialsProfile);
+                }catch(error){
+                    return false;
+                }
+            }
+            // Check if the password was changed
+            if (credentialsProfile.password) {
+                // Prepare new login credentials
+                const newCredentials = {
+                    username: userId.value, 
+                    password: credentialsProfile.password
+                };
+    
+                // Perform a new login with the updated credentials
+                await login(newCredentials);
+            } else {
+                // If password wasn't changed, just reload user data
+                //await loadUser();
+            }
+    
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
+    
 
     async function logout () {
         try {
@@ -102,5 +140,6 @@ export const useUserStore = defineStore('user', () => {
         logout,
         restoreToken,
         userType,
+        profile,
     }
 })

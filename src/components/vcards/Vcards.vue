@@ -8,8 +8,18 @@ import { useToast } from "vue-toastification"
 
 const router = useRouter()
 const userStore = useUserStore()
-
 const toast = useToast()
+const props = defineProps({
+VcardsTitle: {
+    type: String,
+    default: 'Vcards Manager'
+  },
+  onlyCurrentVcards: {
+    type: Boolean,
+    default: false
+  }
+})
+
 
 const loadVcards = async () => {
   try {
@@ -20,9 +30,9 @@ const loadVcards = async () => {
   }
 }
 
-// const addTransaction = () => {
-//     router.push({ name: 'NewTransaction' })
-// }
+  // const addTransaction = () => {
+  //     router.push({ name: 'NewTransaction' })
+  // }
 
 const editVcard = async (vcard) => {
   try{
@@ -35,7 +45,6 @@ const editVcard = async (vcard) => {
     } catch (error) {
       toast.error('Erro ao atualizar os dados!')
     }
-
 }
 
 const deletedVcard =async  (deletedVcard) => {
@@ -45,6 +54,7 @@ const deletedVcard =async  (deletedVcard) => {
         // delete from the local array
         // Show a success alert
         toast.sucess(responseDelete.data.message);
+        loadVcards();
         
         } catch (error) {
           toast.error("erro ao eliminar o vcard");
@@ -52,139 +62,152 @@ const deletedVcard =async  (deletedVcard) => {
         }    
 }
 
-const props = defineProps({
-VcardsTitle: {
-    type: String,
-    default: 'Vcards'
-  },
-  onlyCurrentVcards: {
-    type: Boolean,
-    default: false
+
+  const vcards = ref([])
+  const filterByBlocked= ref('')
+  const filterByName = ref('')
+  const filterByPhoneNumber = ref('')
+  const currentPage = ref(1);
+
+  const filteredVcards = computed( () => {
+    let filtered = vcards.value;
+    if (filterByBlocked.value) {
+      filtered = filtered.filter(v => v.blocked == filterByBlocked.value)
+    }
+    if (filterByName.value) {
+      //filter y phone_number or by name
+      filtered = filtered.filter(v =>
+        v.name && v.name.toString().includes(filterByName.value)
+      );
+    }
+    if (filterByPhoneNumber.value){
+      filtered = filtered.filter(v =>
+        v.phone_number && v.phone_number.toString().includes(filterByPhoneNumber.value)
+      );
+    }
+
+
+  const totalFiltered = filtered.length;
+  const start = (currentPage.value - 1) * itemsPerPage;
+  const end = Math.min(start + itemsPerPage, totalFiltered);
+  return filtered.slice(start, end);
+  })
+  const itemsPerPage = 10;
+  const totalVcards = computed( () => {
+    return vcards.value.length  
+  })
+
+  const totalPageCount = computed(() => {
+  return Math.ceil(vcards.value.length / itemsPerPage);
+});
+
+const updatePage = (direction) => {
+  if (direction === 'prev' && currentPage.value > 1) {
+    currentPage.value--;
+  } else if (direction === 'next' && currentPage.value < totalPageCount.value) {
+    currentPage.value++;
+    totalPageCount.value = Math.ceil(vcards.value.length / itemsPerPage);
   }
-})
-
-const vcards = ref([])
-const filterByVcardsId = ref(-1)
-const filterByCompleted = ref(-1)
-
-const filteredTransactions = computed( () => {
-  return vcards.value.filter(t =>
-      (props.onlyCurrentTasks && !t.completed)
-      ||
-      (!props.onlyCurrentTasks && (
-        (filterByVcardsId.value == -1
-          || filterByVcardsId.value == t.transaction_id
-        ) &&
-        (filterByCompleted.value == -1
-          || filterByCompleted.value == 0 && !t.completed
-          || filterByCompleted.value == 1 && t.completed
-        ))))
-
-})
-
-const totalTransactions = computed( () => {
-  return vcards.value.reduce((c, t) =>
-      (props.onlyCurrentTasks && !t.completed)
-        ||
-        (!props.onlyCurrentTasks && (
-          (filterByVcardsId.value == -1
-            || filterByVcardsId.value == t.project_id
-          ) &&
-          (filterByCompleted.value == -1
-            || filterByCompleted.value == 0 && !t.completed
-            || filterByCompleted.value == 1 && t.completed
-          ))) ? c + 1 : c, 0)
-  
-})
+};
 
 
 
-onMounted (() => {
-  loadVcards()
-})
-</script>
+  onMounted (() => {
+    loadVcards()
+  })
+  </script>
 
-<template>
-     <confirmation-dialog
-    ref="deleteConfirmationDialog"
-    confirmationBtn="Delete vcard"
-    :msg="`Do you really want to delete the vcard?`"
-    @confirmed="deleteTransactionConfirmed"
-  >
-  </confirmation-dialog>
-  <div class="d-flex justify-content-between">
-    <div class="mx-2">
-      <h3 class="mt-4">{{ vcardsTitle }}</h3>
+  <template>
+      <confirmation-dialog
+      ref="deleteConfirmationDialog"
+      confirmationBtn="Delete vcard"
+      :msg="`Do you really want to delete the vcard?`"
+      @confirmed="deleteTransactionConfirmed"
+    >
+    </confirmation-dialog>
+    
+    <div class="d-flex justify-content-between">
+      <div class="mx-2">
+        <h3 class="mt-4">{{ VcardsTitle }}</h3>
+      </div>
+      <div class="mx-2 total-filtro">
+        <h5 class="mt-4">Total: {{ totalVcards }}</h5>
+      </div>
     </div>
-    <div class="mx-2 total-filtro">
-      <h5 class="mt-4">Total: {{ totalVcards }}</h5>
+    <hr>
+    <h2>Filtros</h2>
+    <div
+      v-if="!onlyCurrentVcards"
+      class="mb-3 d-flex justify-content-between flex-wrap"
+    >
+      <div class="mx-2 mt-2 flex-grow-1 filter-div">
+        <label
+          for="selectBlocked"
+          class="form-label"
+        >Bloqueado</label>
+        <select
+          class="form-select"
+          id="selectBlocked"
+          v-model="filterByBlocked"
+        >
+          <option value="">Any</option>
+          <option value="1">Blocked</option>
+          <option value="0">Active</option>
+        </select>
+      </div>
+      <div class="mx-2 mt-2 flex-grow-1 filter-div">
+        <label
+          for="name"
+          class="form-label"
+        >Nome utilizador</label>
+        <input class="form-control"
+          id="name" v-model="filterByName">
+      </div>
+      <div class="mx-2 mt-2 flex-grow-1 filter-div">
+        <label
+          for="phone_number"
+          class="form-label"
+        >Numero Telefone</label>
+        <input class="form-control"
+          id="phone_number" type="number" v-model="filterByPhoneNumber">
+      </div>
+      <!-- <div class="mx-2 mt-2">
+        <button
+          type="button"
+          class="btn btn-success px-4 btn-addtask"
+          @click="addTransaction"
+        ><i class="bi bi-xs bi-plus-circle"></i>&nbsp; Nova Transação</button>
+      </div> -->
     </div>
+    <VcardList
+      :vcards="filteredVcards"
+      :showId="true"
+      :showOwner="false"
+      @requestUpdateVcard="editVcard"
+      @requestRemoveFromListVcard="deletedVcard"
+    ></VcardList>
+    <div class="pagination-controls">
+    <button class="btn-pagination" @click="updatePage('prev')">Previous</button>
+    <span>Page {{ currentPage }} of {{ totalPageCount }}</span>
+    <button class="btn-pagination" @click="updatePage('next')">Next</button>
   </div>
-  <hr>
-  <div
-    v-if="!onlyCurrentVcards"
-    class="mb-3 d-flex justify-content-between flex-wrap"
-  >
-    <div class="mx-2 mt-2 flex-grow-1 filter-div">
-      <label
-        for="selectCompleted"
-        class="form-label"
-      >Filter by completed:</label>
-      <select
-        class="form-select"
-        id="selectCompleted"
-        v-model="filterByCompleted"
-      >
-        <option value="-1">Any</option>
-        <option value="0">Pending Tasks</option>
-        <option value="1">Completed Tasks</option>
-      </select>
-    </div>
-    <div class="mx-2 mt-2 flex-grow-1 filter-div">
-      <label
-        for="selectProject"
-        class="form-label"
-      >Filter by vcards:</label>
-      <select
-        class="form-select"
-        id="selectProject"
-        v-model="filterByVcardId"
-      >
-        <!-- <option value="-1">Any</option>
-        <option :value="null">-- No project --</option>
-        <option
-          v-for="trs in transactionsStore.vcards"
-          :key="trs.id"
-          :value="trs.id"
-        >{{trs.name}}</option> -->
-      </select>
-    </div>
-    <!-- <div class="mx-2 mt-2">
-      <button
-        type="button"
-        class="btn btn-success px-4 btn-addtask"
-        @click="addTransaction"
-      ><i class="bi bi-xs bi-plus-circle"></i>&nbsp; Nova Transação</button>
-    </div> -->
-  </div>
-  <VcardList
-    :vcards="vcards"
-    :showId="true"
-    :showOwner="false"
-    @requestUpdateVcard="editVcard"
-    @requestRemoveFromListVcard="deletedVcard"
-  ></VcardList>
-</template>
+  </template>
 
 
-<style scoped>
-.filter-div {
-  min-width: 12rem;
+  <style scoped>
+  .filter-div {
+    min-width: 12rem;
+  }
+  .total-filtro {
+    margin-top: 0.35rem;
+  }
+  .btn-addtask {
+    margin-top: 1.85rem;
+  }
+
+  .pagination-controls {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1em;
 }
-.total-filtro {
-  margin-top: 0.35rem;
-}
-.btn-addtask {
-  margin-top: 1.85rem;
-}
-</style>
+  </style>

@@ -68,17 +68,10 @@ const clickMenuOption = () => {
             <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
               <li>
                 <router-link class="dropdown-item"
-                            :class="{ active: $route.name == 'User' && $route.params.id == userStore.userId }"
-                            :to="{ name: 'User', params: { id: userStore.userId } }" @click="clickMenuOption">
+                            :class="{ active: $route.name == 'Profile' && $route.params.id == userStore.userId }"
+                            :to="{ name: 'Profile', params: { id: userStore.userId } }" @click="clickMenuOption">
                   <i class="bi bi-person-square"></i>
                   Profile
-                </router-link>
-              </li>
-              <li>
-                <router-link class="dropdown-item" :class="{ active: $route.name === 'ChangePassword' }" 
-                              :to="{ name: 'ChangePassword' }" @click="clickMenuOption">
-                  <i class="bi bi-key-fill"></i>
-                  Change password
                 </router-link>
               </li>
               <li>
@@ -108,20 +101,27 @@ const clickMenuOption = () => {
       <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
         <div class="position-sticky pt-3">
           <ul class="nav flex-column" v-if="userStore.user">
-            <li class="nav-item">
+            <li class="nav-item" v-show="userStore.userType == 'V' ">
               <router-link class="nav-link" :class="{ active: $route.name === 'Dashboard' }" 
                           :to="{ name: 'Dashboard' }" @click="clickMenuOption">
                 <i class="bi bi-house"></i>
                 Dashboard
               </router-link> 
             </li>
-            <li class="nav-item d-flex justify-content-between align-items-center pe-3" v-show="userStore.userType=='V'">
+            <li class="nav-item" v-show="userStore.userType == 'A' ">
+              <router-link class="nav-link" :class="{ active: $route.name === 'DashboardAdmin' }" 
+                          :to="{ name: 'DashboardAdmin' }" @click="clickMenuOption">
+                <i class="bi bi-house"></i>
+                Dashboard
+              </router-link> 
+            </li>
+            <li v-show="userStore.userType == 'V'" class="nav-item d-flex justify-content-between align-items-center pe-3" >
               <router-link class="nav-link w-100 me-3" :class="{ active: $route.name === 'Transactions' }" 
                           :to="{ name: 'Transactions' }" @click="clickMenuOption">
                 <i class="bi bi-list-check"></i>
                 Transações
               </router-link>
-              <router-link class="link-secondary" :to="{ name: 'NewTransaction' }" aria-label="Add a new task" @click="clickMenuOption">
+              <router-link class="link-secondary" :to="{ name: 'NewTransaction' }" aria-label="Add a new task" v-show="userStore.userType == 'V' " @click="clickMenuOption"> 
                 <i class="bi bi-xs bi-plus-circle"></i>
               </router-link>
             </li>
@@ -130,6 +130,13 @@ const clickMenuOption = () => {
                             :to="{ name: 'Vcards' }" @click="clickMenuOption">
                   <i class="bi bi-files"></i>
                     Gestão VCards
+                </router-link>
+            </li>
+            <li v-show="userStore.userType ==='A'" class="nav-item">
+                <router-link class="nav-link" :class="{ active: $route.name === 'TransactionsAll' }" 
+                            :to="{ name: 'TransactionsAll' }" @click="clickMenuOption">
+                  <i class="bi bi-files"></i>
+                    Gestão Transacções
                 </router-link>
             </li>
             <li class="nav-item" v-show="userStore.userType == 'A' " >
@@ -186,17 +193,17 @@ const clickMenuOption = () => {
                 <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink2">
                   <li>
                     <router-link class="dropdown-item"
-                                :class="{ active: $route.name == 'User' && $route.params.id == userStore.userId }"
-                                :to="{ name: 'User', params: { id: userStore.userId } }" @click="clickMenuOption">
+                                :class="{ active: $route.name == 'Profile' && $route.params.id == userStore.userId }"
+                                :to="{ name: 'Profile', params: { id: userStore.userId } }" @click="clickMenuOption">
                       <i class="bi bi-person-square"></i>
                       Profile
                     </router-link>
                   </li>
                   <li>
-                    <router-link class="dropdown-item" :class="{ active: $route.name === 'ChangePassword' }" 
-                                  :to="{ name: 'ChangePassword' }" @click="clickMenuOption">
+                    <router-link class="dropdown-item" :class="{ active: $route.name === 'Categories' }" 
+                                  :to="{ name: 'Categories' }" @click="clickMenuOption">
                       <i class="bi bi-key-fill"></i>
-                      Change password
+                      Configure Categories
                     </router-link>
                   </li>
                   <li>

@@ -78,7 +78,10 @@ const userStore = useUserStore()
   }
 
   onMounted(() => {
+    if (userStore.userType == 'V') {
+     
     fetchCategories()
+    }
   })
 </script>
 
@@ -107,6 +110,20 @@ const userStore = useUserStore()
       >
       <field-error-message :errors="errors" fieldNumber="value"></field-error-message>
     </div>
+    <div class="mb-3" v-show="userStore.userType=='A'">
+      <label
+        for="vcard"
+        class="form-label"
+      >Numero VCard</label>
+      <input
+        type = "number"
+        class="form-control"
+        :class="{ 'is-invalid': errors ? errors['vcard'] : false }"
+        id="vcard"
+        v-model="editingTransaction.vcard"
+      >
+      <field-error-message :errors="errors" fieldName="vcard"></field-error-message>
+    </div>
     <div class="mb-3">
       <label
         for="payment_type"
@@ -127,7 +144,7 @@ const userStore = useUserStore()
       </select>
       <field-error-message :errors="errors" fieldName="payment_type"></field-error-message>
     </div>
-    <div class="mb-3">
+    <div class="mb-3" v-show="userStore.userType=='V'"> 
       <label
         for="category_id"
         class="form-label"
@@ -174,7 +191,6 @@ const userStore = useUserStore()
       ></textarea>
       <field-error-message :errors="errors" fieldName="description"></field-error-message>
     </div>
-
     <div class="mb-3 d-flex justify-content-end">
       <button
         type="button"

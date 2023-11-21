@@ -48,34 +48,39 @@ TransactionsTitle: {
 const transactions = ref([])
 const filterByTransactionId = ref(-1)
 const filterByCompleted = ref(-1)
+const filterByType = ref(''); // 'Debit', 'Credit', or '' for all
+const sortBy = ref('date'); // 'date' or 'description'
+const filterByDescription = ref('')
 
-const filteredTransactions = computed( () => {
-  return transactions.value.filter(t =>
-      (props.onlyCurrentTasks && !t.completed)
-      ||
-      (!props.onlyCurrentTasks && (
-        (filterByTransactionId.value == -1
-          || filterByTransactionId.value == t.transaction_id
-        ) &&
-        (filterByCompleted.value == -1
-          || filterByCompleted.value == 0 && !t.completed
-          || filterByCompleted.value == 1 && t.completed
-        ))))
 
-})
+const filteredTransactions = computed(() => {
+  let filtered = transactions.value;
+
+  // Filter by transaction type
+  if (filterByType.value) {
+    filtered = filtered.filter(t => t.type === filterByType.value);
+  }
+  if (filterByDescription.value) {
+    filtered = filtered.filter(t =>
+      t.description && t.description.toString().includes(filterByDescription.value)
+    );
+  }
+
+  // Sort by date or description
+  // filtered = filtered.sort((a, b) => {
+  //   if (sortBy.value === 'date') {
+  //     return new Date(a.date) - new Date(b.date);
+  //   } else if (sortBy.value === 'description') {
+  //     return a.description.localeCompare(b.description);
+  //   }
+  //   return 0;
+  // });
+
+  return filtered;
+});
 
 const totalTransactions = computed( () => {
-  return transactions.value.reduce((c, t) =>
-      (props.onlyCurrentTasks && !t.completed)
-        ||
-        (!props.onlyCurrentTasks && (
-          (filterByTransactionId.value == -1
-            || filterByTransactionId.value == t.project_id
-          ) &&
-          (filterByCompleted.value == -1
-            || filterByCompleted.value == 0 && !t.completed
-            || filterByCompleted.value == 1 && t.completed
-          ))) ? c + 1 : c, 0)
+  return transactions.value.length
   
 })
 
@@ -101,37 +106,31 @@ onMounted (() => {
   >
     <div class="mx-2 mt-2 flex-grow-1 filter-div">
       <label
-        for="selectCompleted"
+        for="selectType"
         class="form-label"
       >Filter by completed:</label>
       <select
         class="form-select"
-        id="selectCompleted"
-        v-model="filterByCompleted"
+        id="selectType"
+        v-model="filterByType"
       >
-        <option value="-1">Any</option>
-        <option value="0">Pending Tasks</option>
-        <option value="1">Completed Tasks</option>
+        <option value="">All Types</option>
+        <option value="D">Debit</option>
+        <option value="C">Credit</option>
       </select>
     </div>
     <div class="mx-2 mt-2 flex-grow-1 filter-div">
       <label
-        for="selectProject"
+        for="description"
         class="form-label"
-      >Filter by project:</label>
-      <select
-        class="form-select"
-        id="selectProject"
-        v-model="filterByProjectId"
+      >Decrição:</label>
+      <input
+        type="text"
+        class="form-control"
+        id="description"
+        placeholder="Descrição da Transação"
+        v-model="filterByDescription"
       >
-        <option value="-1">Any</option>
-        <option :value="null">-- No project --</option>
-        <option
-          v-for="trs in transactionsStore.transactions"
-          :key="trs.id"
-          :value="trs.id"
-        >{{trs.name}}</option>
-      </select>
     </div>
     <div class="mx-2 mt-2">
       <button

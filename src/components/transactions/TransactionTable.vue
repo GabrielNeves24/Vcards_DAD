@@ -2,9 +2,9 @@
 import axios from 'axios'
 import { useToast } from "vue-toastification"
 import { ref, watch, computed } from "vue"
-
+import { useUserStore } from '../../stores/user';
 //const toast = useToast()
-
+const userStore = useUserStore()
 const props = defineProps({
   transactions: {
     type: Array,
@@ -114,7 +114,8 @@ const editClick = (transaction) => {
         <th>Type</th>
         <th>Value</th>
         <th>Old Balance</th>
-        <th v-if="showCompletedButton || showEditButton || showDeleteButton"></th>
+        <th>Tipo Pagamento</th>
+        <th v-if="showCompletedButton || showEditButton || showDeleteButton" v-show="userStore.userType=='V'"></th>
       </tr>
     </thead>
     <tbody>
@@ -127,7 +128,8 @@ const editClick = (transaction) => {
         <td>{{ transaction.type }}</td>
         <td>{{ transaction.value }}</td>
         <td>{{ transaction.old_balance }}</td>
-        <td
+        <td>{{ transaction.payment_type }}</td>
+        <td v-show="userStore.userType=='V'"
           class="text-end"
           v-if="showEditButton">
           <div class="d-flex justify-content-end">
