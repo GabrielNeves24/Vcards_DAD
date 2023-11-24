@@ -22,22 +22,15 @@ const credentialsProfile = ref({
     id: '',
     name: '',
     email: '',
-    photo: null,
+    photo_url: null,
     confirmationCode: null,
     password: null,
     passwordConfirmation: null,
+
 };
 
-  const handleImageUpload = event => {
-  const file = event.target.files[0];
-  if (file) {
-    // You can use FileReader, Base64 encoding, or FormData here depending on your API
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      credentialsProfile.value.profileImage = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  }
+const handleFileUpload = (event) => {
+  credentialsProfile.value.photo_url = event.target.files[0];
 };
 const emit = defineEmits(['profile'])
 
@@ -61,15 +54,19 @@ const profile = async () => {
   // Check if no changes were made
   if (initialData.name == credentialsProfile.value.name && 
       initialData.email == credentialsProfile.value.email &&
-      !credentialsProfile.value.password && 
-      !credentialsProfile.value.confirmation_code) {
+      credentialsProfile.value.password == null && 
+      credentialsProfile.value.confirmation_code == null) {
         toast.error('No changes were made');
         return;
+    }
+    const formData = new FormData();
+    for (const key in credentialsProfile.value) {
+        formData.append(key, credentialsProfile.value[key]);
     }
     //if only alter name and email do the followingprofile
     if (initialData.name != credentialsProfile.value.name || initialData.email != credentialsProfile.value.email && credentialsProfile.value.password == '' && credentialsProfile.value.confirmation_code == '') {
       console.log('alter name and email');
-      if (await userStore.profile(credentialsProfile.value)) {
+      if (await userStore.profile(formData)) {
         toast.success('Profile updated successfully.');
         emit('profile');
         router.push({ name: 'Profile' });
@@ -86,7 +83,7 @@ const profile = async () => {
           return;
       }else{
               console.log('password is correct');
-        if (await userStore.profile(credentialsProfile.value)) {
+        if (await userStore.profile(formData)) {
           toast.success('Profile updated successfully.');
           emit('profile');
           router.push({ name: 'Profile' });
@@ -201,8 +198,8 @@ onMounted(() => {
 
       <!-- User Image on the Right -->
       <div class="col-md-6 d-flex align-items-center justify-content-center">
-        <img :src="userStore.userPhotoUrl" alt="User Photo" class="img-fluid rounded-circle" style="max-width: 200px;">
-        <input type="file" accept="image/*" @change="handleImageUpload">
+        <img :src="userStore.userPhotoUrl" alt="Vcard Foto" class="img-fluid rounded-circle" style="max-width: 200px;">
+        <input type="file" accept="image/*" @change="handleFileUpload">
       </div>
     </div>
   </div>

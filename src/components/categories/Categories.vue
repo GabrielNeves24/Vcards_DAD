@@ -8,6 +8,19 @@ import CategoryTable from "./CategoryTable.vue"
 const router = useRouter()
 const userStore = useUserStore()
 
+
+const props = defineProps({
+categoriesTitle: {
+    type: String,
+    default: 'Categories'
+  },
+  onlyCurrentCategories: {
+    type: Boolean,
+    default: false
+  }
+})
+
+
 const loadCategories = async () => {
   try {
     const response = await axios.get('vcards/' + userStore.userId + '/categories')
@@ -32,50 +45,49 @@ const deletedCategory = (deletedCategory) => {
     }
 }
 
-const props = defineProps({
-categoriesTitle: {
-    type: String,
-    default: 'Categories'
-  },
-  onlyCurrentCategories: {
-    type: Boolean,
-    default: false
-  }
-})
 
 const categories = ref([])
 const filterByName = ref('') // New ref for filtering by name
 const filterByType = ref('') // New ref for filtering by type (debit/credit)
+const currentPage = ref(1);
 
-const filteredCategories = computed(() => {
-   return categories
-   //.value.filter(category => {
-  //   let matchesName = filterByName.value === '' || category.name.includes(filterByName.value)
-  //   let matchesType = filterByType.value === '' || category.type === filterByType.value
-  //   return matchesName && matchesType
-  // })
-})
+const filteredCategories2 = computed( () => {
+  
+  let filtered = categories.value
+      // if (filterByName.value) {
+      //   filtered = filtered.filter(v =>
+      //       v.name && v.name.toString().includes(filterByName.value)
+      //   );
+      // }
+  //  //  if (filterByType.value) {
+  //  //    filtered = filtered.filter((t) => t.type === filterByType.value)
+  //  //  }
+  const totalFiltered = filtered.length;
+  const start = (currentPage.value - 1) * itemsPerPage;
+  const end = Math.min(start + itemsPerPage, totalFiltered);
+  console.log(filtered)
+  return filtered.slice(start, end);
+});
 
 
 
+const itemsPerPage = 10;
+const totalCategories = computed( () => {
+  return categories.value.length  
+});
 
+const totalPageCount = computed(() => {
+  return Math.ceil(categories.value.length / itemsPerPage);
+});
 
-const totalCategories = computed(() => {
-  return categories.value.reduce((count, category) => {
-    let matchesName = filterByName.value === '' || category.name.includes(filterByName.value);
-    let matchesType;
-
-    if (filterByType.value === '') {
-      matchesType = true; // If no type filter is selected, include all types
-    } else {
-      // Assuming 'type' is a property of your category object and it stores 'D' for Debit and 'C' for Credit
-      matchesType = category.type === filterByType.value;
-    }
-
-    return (matchesName && matchesType) ? count + 1 : count;
-  }, 0);
-})
-
+const updatePage = (direction) => {
+  if (direction === 'prev' && currentPage.value > 1) {
+    currentPage.value--;
+  } else if (direction === 'next' && currentPage.value < totalPageCount.value) {
+    currentPage.value++;
+    totalPageCount.value = Math.ceil(categories.value.length / itemsPerPage);
+  }
+};
 
 
 onMounted (() => {
@@ -119,12 +131,17 @@ onMounted (() => {
     </div> 
   </div> 
   <category-table
-    :categories="filteredCategories"  
+    :categories="filteredCategories2"  
     :showId="true"
     :showOwner="false"
     @edit="editCategory"
     @deleted="deletedCategory"
   ></category-table>
+  <div class="pagination-controls">
+    <button class="btn-pagination" @click="updatePage('prev')">Previous</button>
+    <span>Page {{ currentPage }} of {{ totalPageCount }}</span>
+    <button class="btn-pagination" @click="updatePage('next')">Next</button>
+  </div>
 </template>
 
 
@@ -137,5 +154,11 @@ onMounted (() => {
 }
 .btn-addtask {
   margin-top: 1.85rem;
+}
+
+.pagination-controls {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1em;
 }
 </style>

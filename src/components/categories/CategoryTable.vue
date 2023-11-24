@@ -8,7 +8,7 @@ const toast = useToast()
 const props = defineProps({
   categories: {
     type: Array,
-    default: () => [],
+    //default: () => [],
   },
   showId: {
     type: Boolean,

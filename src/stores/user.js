@@ -57,39 +57,47 @@ export const useUserStore = defineStore('user', () => {
         }
     } 
 
-    async function register(credentialsRegister) {
+    async function register(formData) {
         try {
-            const response = await axios.post('register', credentialsRegister)
-            //await projectsStore.loadProjects()
-            return true       
-        } 
-        catch(error) {
-            clearUser()            
-            return false
+            let response = await axios.post('register', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            // Process the response
+            return true;   
+                
+        } catch(error) {
+            clearUser();            
+            return false;
         }
     } 
 
-    async function profile(credentialsProfile) {
+    async function profile(formData) {
         try {
             if(userType.value == 'A'){
                 try{
-                    const response = await axios.put('users/' + userId.value, credentialsProfile);
+                    const response = await axios.put('users/' + userId.value, formData);
                 }catch(error){
                     return false;
                 }
             }else{
                 try{
-                    const response = await axios.put('vcards/' + userId.value, credentialsProfile);
+                    const response = await axios.put('vcards/' + userId.value, formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data'
+                        }
+                    });
                 }catch(error){
                     return false;
                 }
             }
             // Check if the password was changed
-            if (credentialsProfile.password) {
+            if (formData.password) {
                 // Prepare new login credentials
                 const newCredentials = {
                     username: userId.value, 
-                    password: credentialsProfile.password
+                    password: formData.password
                 };
     
                 // Perform a new login with the updated credentials
@@ -126,6 +134,15 @@ export const useUserStore = defineStore('user', () => {
         }
         clearUser()
         return false
+    }
+    
+    async function validatePassword (password) {
+        try {
+            const response = await axios.put('verify-password' + userId.value, password);
+            return true;
+        } catch (error) {   
+            return false;
+        }
     }
 
     return {

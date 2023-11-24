@@ -15,33 +15,29 @@ const credentialsRegsiter = ref({
       email: '',
       phone_number: '',
       confirmation_code: '',
-      photo_url: '',
+      photo_url: ''
   })
 
-  const handleImageUpload = event => {
-  const file = event.target.files[0];
-  if (file) {
-    // You can use FileReader, Base64 encoding, or FormData here depending on your API
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      credentialsRegister.value.profileImage = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  }
+  const handleFileUpload = (event) => {
+    credentialsRegsiter.value.photo_url = event.target.files[0];
 };
 const emit = defineEmits(['register'])
 
 const register = async () => {
   
-  if (await userStore.register(credentialsRegsiter.value)) {
-    toast.success('User ' + userStore.user.name + ' created with sucess.')
-    emit('register')
-    router.push({ name: 'Login' })
-  } else {
-    credentialsRegsiter.value.password = ''
-    toast.error('Erro ao criar utilizador!')
-  }
-}
+  const formData = new FormData();
+    for (const key in credentialsRegsiter.value) {
+        formData.append(key, credentialsRegsiter.value[key]);
+    }
+
+    if (await userStore.register(formData)) {
+        toast.success('Vcard ' + credentialsRegsiter.value.phone_number + ' criado com sucesso.');
+        router.push({ name: 'Login' });
+    } else {
+        credentialsRegsiter.value.password = '';
+        toast.error('Error creating user!');
+    }
+};
 
 </script>
 
@@ -131,7 +127,7 @@ const register = async () => {
     <div class="mb-3">
       <div class="mb-3">
         <label for="photo_url" class="form-label">Profile Image</label>
-        <input type="file" class="form-control" id="photo_url" accept="image/jpeg" @change="handleImageUpload">
+        <input type="file" class="form-control" id="photo_url" accept="image/jpeg" @change="handleFileUpload">
       </div>
     </div>
     <div class="mb-3 d-flex justify-content-center">

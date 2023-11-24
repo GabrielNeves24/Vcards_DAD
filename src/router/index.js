@@ -110,6 +110,12 @@ const router = createRouter({
        name: 'Categories',
        component: Categories,
      },
+     {
+      path: '/Categories/edit/:id',
+      name: 'Category',
+      component: Category,
+     
+    },
 
 
 

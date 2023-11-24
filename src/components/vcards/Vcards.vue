@@ -85,13 +85,17 @@ const deletedVcard =async  (deletedVcard) => {
         v.phone_number && v.phone_number.toString().includes(filterByPhoneNumber.value)
       );
     }
-
+   console.log(filtered)
 
   const totalFiltered = filtered.length;
   const start = (currentPage.value - 1) * itemsPerPage;
   const end = Math.min(start + itemsPerPage, totalFiltered);
+  console.log(filtered)
   return filtered.slice(start, end);
   })
+
+
+  
   const itemsPerPage = 10;
   const totalVcards = computed( () => {
     return vcards.value.length  
