@@ -11,7 +11,7 @@ const userStore = useUserStore()
 
 const credentialsProfile = ref({
       id: userStore.userId,
-      currentPassword: '', // Add this for the current password
+      currentPassword: null, // Add this for the current password
       password: null,
       confirmation_code: null,
   })
@@ -22,21 +22,6 @@ const credentialsProfile = ref({
     passwordConfirmation: null,
 };
 const emit = defineEmits(['profile'])
-
-// const verifyPassword = async (enteredPassword, phone_number, userType) => {
-//     try {
-//         const response = await axios.post('/verify-password', {
-//             enteredPassword: enteredPassword,
-//             user: phone_number,
-//             userType: userType
-//         });
-//         console.log(response.data.isValid);
-//         return response.data.isValid; // Assuming the API returns { isValid: true/false }
-//     } catch (error) {
-//         toast.error('Error verifying password');
-//         return false;
-//     }
-// }
 
 
 const profile = async () => {
@@ -62,8 +47,10 @@ const profile = async () => {
         toast.error('Password atual inválida');
         return;
     }else{
+      console.log(credentialsProfile)
       if (await userStore.profile(credentialsProfile,'password')) {
         toast.success('Passwords atualizada com sucesso!');
+
         //emit('profile');
         router.push({ name: 'Dashboard' });
       } else {
@@ -74,29 +61,8 @@ const profile = async () => {
 }
 
 
-const fetchData = async () => {
-        if (userStore.userType == 'V'){
-          const response = await axios.get(`/vcards/${userStore.userId}`);
-          const data = response.data.data;
-          credentialsProfile.value.name = data.name;
-          credentialsProfile.value.email = data.email;
-          credentialsProfile.value.photo_url = data.photo_url;
-          initialData.name = data.name;
-          initialData.id = data.id
-        initialData.email = data.email;
-        } else {
-          const response = await axios.get(`/users/${userStore.userId}`);
-        const data = response.data.data;
-        credentialsProfile.value.name = data.name;
-        credentialsProfile.value.email = data.email;
-        initialData.name = data.name;
-        initialData.email = data.email;
-        }
-
-};
-
 onMounted(() => {
-    fetchData();
+   
 });
 </script>
 
@@ -129,8 +95,8 @@ onMounted(() => {
               v-model="credentialsProfile.passwordConfirmation"
             >
           </div>
-          <div class="mb-3">
-            <label for="confirmation_code" class="form-label">Código de Confirmação</label>
+          <div class="mb-3" v-show="userStore.userType == 'V'">
+            <label for="confirmation_code" class="form-label">Novo Código de Confirmação (4 Digitos)</label>
             <input
               type="number"
               class="form-control"

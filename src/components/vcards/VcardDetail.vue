@@ -45,6 +45,7 @@ onMounted(() => {
           type="checkbox"
           id="blocked"
           v-model="editVcard.blocked"
+          :checked="editVcard.blocked"
         />
         <label class="form-check-label" for="blocked">{{ editVcard.blocked ? 'Sim' : 'Não' }}</label>
       </div>

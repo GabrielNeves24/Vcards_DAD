@@ -24,20 +24,40 @@ const credentialsRegsiter = ref({
 const emit = defineEmits(['register'])
 
 const register = async () => {
-  
-  const formData = new FormData();
+    const formData = new FormData();
     for (const key in credentialsRegsiter.value) {
         formData.append(key, credentialsRegsiter.value[key]);
     }
 
-    if (await userStore.register(formData)) {
-        toast.success('Vcard ' + credentialsRegsiter.value.phone_number + ' criado com sucesso.');
-        router.push({ name: 'Login' });
-    } else {
+    try {
+        const response = await userStore.register(formData);
+        if (response === true) {
+            toast.success('Vcard ' + credentialsRegsiter.value.phone_number + ' criado com sucesso.');
+            router.push({ name: 'Login' });
+        }
+    } catch (error) {
+        toast.error('Erro ao criar Vcard!');
+        handleApiErrors(error);
         credentialsRegsiter.value.password = '';
-        toast.error('Error creating user!');
     }
 };
+
+function handleApiErrors(error) {
+    if (error.response && error.response.data && error.response.data.error) {
+        if (Array.isArray(error.response.data.error)) {
+            // If the error is an array (multiple messages)
+            error.response.data.error.forEach(message => {
+                toast.error(message);
+            });
+        } else {
+            // Single error message
+            toast.error(error.response.data.error);
+        }
+    } else {
+        // Fallback error message
+        toast.error('An unexpected error occurred!');
+    }
+}
 
 </script>
 

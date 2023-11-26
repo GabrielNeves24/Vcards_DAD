@@ -15,6 +15,7 @@ import Profile from "../components/auth/Profile.vue"
 //import TransactionsAll from "../components/OLD/TransactionsAll.vue.js"
 import NewTransactionCredit from "../components/transactions/TransactionCredit.vue"
 import DashboardAdmin from "../components/DashboardAdmin.vue"
+import User from "../components/users/User.vue"
 
 let handlingFirstRoute = true
 
@@ -192,6 +193,9 @@ const router = createRouter({
       //props: route => ({ id: parseInt(route.params.id) })
     },
 
+
+
+    //Gestão Users
     {
       path: '/users',
       name: 'Users',
@@ -200,11 +204,17 @@ const router = createRouter({
     {
       path: '/users/:id',
       name: 'User',
-      //component: User,
-      //props: true
-      // Replaced with the following line to ensure that id is a number
-      //props: route => ({ id: parseInt(route.params.id) })
-    }, 
+    },
+    {
+      path: '/users/new',
+      name: 'NewUser',
+      component: User,
+    },
+
+
+
+
+
     {
       path: '/projects/:id/tasks',
       name: 'ProjectTasks',

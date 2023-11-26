@@ -10,23 +10,16 @@ const router = useRouter()
 const userStore = useUserStore()
 
 const credentialsProfile = ref({
-      name: '',
-      email: '',
-      //currentPassword: '', // Add this for the current password
-      //password: null,
-      //passwordConfirmation: null,
-      //confirmation_code: null,
-      photo_url: '',
+      id: userStore.userId,
+      name: null,
+      email: null,
+      photo_url: null,
   })
   const initialData = {
-    id: '',
-    name: '',
-    email: '',
+    id: userStore.userId,
+    name: null,
+    email: null,
     photo_url: null,
-    //confirmationCode: null,
-    //password: null,
-    //passwordConfirmation: null,
-
 };
 
 const handleFileUpload = (event) => {
@@ -42,17 +35,12 @@ const profile = async () => {
         toast.error('Sem alterações');
         return;
     }
-    const formData = new FormData();
-    for (const key in credentialsProfile.value) {
-        formData.append(key, credentialsProfile.value[key]);
-    }console.log('entrou')
     //if only alter name and email do the followingprofile
     if (initialData.name != credentialsProfile.value.name || initialData.email != credentialsProfile.value.email || credentialsProfile.value.photo_url != null) {
       //console.log(await userStore.profile(credentialsProfile,'perfil'))
       if (await userStore.profile(credentialsProfile,'perfil')) {
-        console.log('entrou')
         toast.success('Perfil atualizado com sucesso.');
-        emit('profile');
+        //emit('profile');
         router.push({ name: 'Dashboard' });
       } else {
         toast.error('Erro ao atualizar perfil!');
@@ -67,10 +55,10 @@ const fetchData = async () => {
           const data = response.data.data;
           credentialsProfile.value.name = data.name;
           credentialsProfile.value.email = data.email;
-          credentialsProfile.value.photo_url = data.photo_url;
+          //credentialsProfile.value.photo_url = data.photo_url;
           initialData.name = data.name;
-          initialData.id = data.id
-        initialData.email = data.email;
+          //initialData.id = data.id
+          initialData.email = data.email;
         } else {
           const response = await axios.get(`/users/${userStore.userId}`);
         const data = response.data.data;
@@ -127,7 +115,7 @@ onMounted(() => {
           </div>
         </form>
       </div>
-      <div class="col-md-6 d-flex align-items-center justify-content-center">
+      <div v-if="userStore.userType == 'V'" class="col-md-6 d-flex align-items-center justify-content-center" >
         <img :src="userStore.userPhotoUrl" alt="Vcard Foto" class="img-fluid rounded-circle" style="max-width: 200px;">
         <input type="file" accept="image/*" @change="handleFileUpload">
       </div>

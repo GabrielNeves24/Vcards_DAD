@@ -17,7 +17,8 @@ const newTransaction = () => {
   return {
     id: null,
     vcard: userStore.userId,
-    type: 'D',
+    //type C or D,
+    type: null,
     value: null,
     payment_type: null,
     payment_reference: null,
@@ -54,18 +55,31 @@ const save = async () => {
   if (operation.value == 'insert') {
     try {
       console.log(transaction.value)
-      const response = await axios.post('transactions/debit', transaction.value)
-      transaction.value = response.data.data
-      //console.log(transaction.value)
-      originalValueStr = 1;//JSON.stringify(transaction.value)
-      toast.success('Transação criada com sucesso!')
-      router.back()
+      //add type to transaction
+      if (userStore.userType == 'A'){
+        transaction.value.type = 'C'
+        const response = await axios.post('transactions/credit', transaction.value)
+        transaction.value = response.data.data
+        //console.log(transaction.value)
+        originalValueStr = JSON.stringify(transaction.value)
+        toast.success('Transação criada com sucesso!')
+        router.back()
+        router.push({ name: 'Transactions' })
+      }else{
+        transaction.value.type = 'D'
+        const response = await axios.post('transactions/debit', transaction.value)
+        transaction.value = response.data.data
+        //console.log(transaction.value)
+        originalValueStr = JSON.stringify(transaction.value)
+        toast.success('Transação criada com sucesso!')
+        router.push({ name: 'Transactions' })
+      }      
     } catch (error) {
       if (error.response.status == 422) {
         errors.value = error.response.data.errors
-        toast.error('Transação was not created due to validation errors!')
+        toast.error('Transação não foi criada!')
       } else {
-        toast.error('Transação was not created due to unknown server error!')
+        toast.error('Transação não foi criada!')
       }
     }
   } else {
@@ -73,14 +87,14 @@ const save = async () => {
       const response = await axios.put('transactions', transaction.value)
       transaction.value = response.data.data
       originalValueStr = JSON.stringify(transaction.value)
-      toast.success('Transação #' + transaction.value.id + ' was updated successfully.')
+      toast.success('Transação ' + transaction.value.id + ' was updated successfully.')
       router.back()
     } catch (error) {
       if (error.response.status == 422) {
         errors.value = error.response.data.errors
-        toast.error('Transação #' + props.id + ' was not updated due to validation errors!')
+        toast.error('Transação ' + props.id + ' não foi atualizada!')
       } else {
-        toast.error('Transação #' + props.id + ' was not updated due to unknown server error!')
+        toast.error('Transação ' + props.id + ' não foi atualizada devido a um erro do servidor! ')
       }
     }
   }

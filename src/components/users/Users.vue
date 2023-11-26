@@ -4,9 +4,11 @@ import { useRouter } from 'vue-router'
 import { useUserStore } from "../../stores/user.js"
 import { ref, computed, onMounted } from 'vue'
 import UserList from "./UserList.vue"
+import { useToast } from "vue-toastification"
 
 const router = useRouter()
 const userStore = useUserStore()
+const toast = useToast()
 
 const loadUsers = async () => {
   try {
@@ -17,25 +19,54 @@ const loadUsers = async () => {
   }
 }
 
-// const addTransaction = () => {
-//     router.push({ name: 'NewTransaction' })
-// }
+const showAddUserForm = ref(false);
+
+const toggleAddUserForm = () => {
+  showAddUserForm.value = !showAddUserForm.value;
+};
+
+const newUser = ref({
+  name: '',
+  email: '',
+  password: ''
+});
+
+const saveNewUser = async () => {
+  try {
+    await axios.post('users', newUser.value);
+    toast.success('Utilizador  criado com sucesso!');
+    newUser.value = { name: '', email: '', password: '' }; // Reset form
+    showAddUserForm.value = false; // Hide form
+    await loadUsers(); // Reload users list
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 const editUser = (user) => {
     router.push({ name: 'User', params: { id: user.id } })
 }
 
-const deletedUser = (deletedUser) => {
-    let idx = users.value.findIndex((t) => t.id === deletedUser.id)
-    if (idx >= 0) {
-        users.value.splice(idx, 1)
+const deletedUser = async (deletedUser) => {
+  if (!deletedUser.value) {
+     console.error("Sem user para eliminar");
+     return;
+   }
+    try {
+      const reponse = await axios.delete('users/' + deletedUser.value.id)
+      toast.success("Administrador eliminado com sucesso")
+      router.push({ name: 'Users' })
+    } catch (error) {
+      console.log(error)
+      toast.error("Erro ao eliminar Administrador")
     }
+
 }
 
 const props = defineProps({
   usersTitle: {
     type: String,
-    default: 'Users Manager'
+    default: 'Gestão Administradores'
   },
   onlyCurrentUsers: {
     type: Boolean,
@@ -112,20 +143,37 @@ onMounted (() => {
           id="name" v-model="filterByName">
       </div>
 
-    <!-- <div class="mx-2 mt-2">
+     <div class="mx-2 mt-2">
       <button
         type="button"
-        class="btn btn-success px-4 btn-addtask"
-        @click="addTransaction"
-      ><i class="bi bi-xs bi-plus-circle"></i>&nbsp; Nova Transação</button>
-    </div> -->
+        class="btn btn-success px-4 btn-adduser"
+        @click="toggleAddUserForm"
+      ><i class="bi bi-xs bi-plus-circle"></i>&nbsp; Novo Administrador</button>
+
+      <div v-if="showAddUserForm">
+        <h3></h3>
+        <div>
+          <label for="newUserName" >Name:</label>
+          <input id="newUserName" class="form-control" v-model="newUser.name" type="text">
+        </div>
+        <div>
+          <label for="newUserEmail" class="form-label">Email:</label>
+          <input id="newUserEmail" class="form-control" v-model="newUser.email" type="email">
+        </div>
+        <div>
+          <label for="newUserPassword" class="form-label">Password:</label>
+          <input id="newUserPassword" class="form-control" v-model="newUser.password" type="password">
+        </div>
+        <button @click="saveNewUser" class="btn btn-success btn-xs">Criar Novo</button>
+      </div>
+    </div>
   </div>
   <UserList
     :users="filteredVcards"
     :showId="true"
     :showOwner="false"
     @edit="editUser"
-    @deleted="deletedUser"
+    @requestRemoveFromListUser="deletedUser"
   ></UserList>
   <div class="pagination-controls">
     <button class="btn-pagination" @click="updatePage('prev')">Previous</button>
@@ -142,7 +190,7 @@ onMounted (() => {
 .total-filtro {
   margin-top: 0.35rem;
 }
-.btn-addtask {
+.btn-adduser {
   margin-top: 1.85rem;
 }
 

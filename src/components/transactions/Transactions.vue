@@ -71,7 +71,7 @@ const filterByDescription = ref('')
 const currentPage = ref(1);
 const itemsPerPage = 10;
 const filterByDate = ref(null);
-const sortOrder = ref('asc'); // 'asc' or 'desc'
+const sortOrder = ref('desc'); 
 const filterByTypePayment = ref(-1); 
 const filterByCategory = ref(-1);
 

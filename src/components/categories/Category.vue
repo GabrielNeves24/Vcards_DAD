@@ -59,6 +59,14 @@ const save = async () => {
   errors.value = null
   let response = null;
   console.log(category.value)
+  if (category.value.type == null){
+    toast.error('Selecione o tipo da categoria')
+    return
+  }
+  if (category.value.name == null){
+    toast.error('Insira o nome da categoria')
+    return
+  }
   if (operation.value == 'insert') {
     try {
       if (userStore.userType == 'V'){

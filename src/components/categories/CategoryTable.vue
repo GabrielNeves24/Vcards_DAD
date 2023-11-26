@@ -79,7 +79,7 @@ const deleteCategoryConfirmed = async () => {
      try {
        await axios.delete('categories/defaults/' + categoryToDelete.value.id)
        emit("deleted", categoryToDelete.value)
-       toast.success("Cetergoria eliminada com sucesso")
+       toast.success("Categoria eliminada com sucesso")
        router.push({ name: 'CategoriesDefaults' })
      } catch (error) {
        console.log(error)
@@ -99,7 +99,7 @@ const deleteCategoryConfirmed = async () => {
  }
 
  const categoryToDeleteDescription = computed(() => categoryToDelete.value
-   ? `#${categoryToDelete.value.id} (${categoryToDelete.value.name})`
+   ? `(${categoryToDelete.value.type}) ${categoryToDelete.value.name}`
    : "")
 
 </script>
