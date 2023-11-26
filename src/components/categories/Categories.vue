@@ -8,19 +8,6 @@ import CategoryTable from "./CategoryTable.vue"
 const router = useRouter()
 const userStore = useUserStore()
 
-
-const props = defineProps({
-categoriesTitle: {
-    type: String,
-    default: 'Categories'
-  },
-  onlyCurrentCategories: {
-    type: Boolean,
-    default: false
-  }
-})
-
-
 const loadCategories = async () => {
   try {
     const response = await axios.get('vcards/' + userStore.userId + '/categories')
@@ -38,30 +25,38 @@ const editCategory = (categories) => {
     router.push({ name: 'Category', params: { id: categories.id } })
 }
 
-const deletedCategory = (deletedCategory) => {
-    let idx = categories.value.findIndex((t) => t.id === deletedCategory.id)
-    if (idx >= 0) {
-      categories.value.splice(idx, 1)
-    }
+const deletedCategory = () => {
+    loadCategories()
 }
+
+const props = defineProps({
+  categoriesTitle: {
+    type: String,
+    default: 'Categories'
+  },
+  onlyCurrentCategories: {
+    type: Boolean,
+    default: false
+  }
+})
 
 
 const categories = ref([])
 const filterByName = ref('') // New ref for filtering by name
-const filterByType = ref('') // New ref for filtering by type (debit/credit)
+const filterByType = ref(-1) // New ref for filtering by type (debit/credit)
 const currentPage = ref(1);
 
 const filteredCategories2 = computed( () => {
   
   let filtered = categories.value
-      // if (filterByName.value) {
-      //   filtered = filtered.filter(v =>
-      //       v.name && v.name.toString().includes(filterByName.value)
-      //   );
-      // }
-  //  //  if (filterByType.value) {
-  //  //    filtered = filtered.filter((t) => t.type === filterByType.value)
-  //  //  }
+     if (filterByName.value !== '') {
+       filtered = filtered.filter(v =>
+           v.name && v.name.toString().includes(filterByName.value)
+       );
+     }
+     if (filterByType.value !== -1) {
+       filtered = filtered.filter((t) => t.type === filterByType.value)
+     }
   const totalFiltered = filtered.length;
   const start = (currentPage.value - 1) * itemsPerPage;
   const end = Math.min(start + itemsPerPage, totalFiltered);
@@ -116,7 +111,7 @@ onMounted (() => {
     <div class="mx-2 mt-2 flex-grow-1 filter-div">
       <label for="filterByType" class="form-label">Filter by Type:</label>
       <select class="form-select" id="filterByType" v-model="filterByType">
-        <option value="">Any</option>
+        <option value="-1">Any</option>
         <option value="D">Debit</option>
         <option value="C">Credit</option>
       </select>

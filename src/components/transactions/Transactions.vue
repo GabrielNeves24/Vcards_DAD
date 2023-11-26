@@ -11,11 +11,36 @@ const userStore = useUserStore()
 const transactionsStore = useTransactionsStore()
 
 const loadTransactions = async () => {
-  try {
+  if (userStore.userId == null) {
+    return
+  }
+  if (userStore.userType == 'A') {
+      try {
+      const response = await axios.get('transactions')
+      transactions.value = response.data.data
+    } catch (error) {
+      console.log(error)
+    }
+  }else{
+    try {
     const response = await axios.get('vcards/' + userStore.userId + '/transactions/all')
     transactions.value = response.data.data
   } catch (error) {
     console.log(error)
+  }
+  }
+}
+const loadCategories = async () => {
+  if (userStore.userId == null) {
+    return
+  }
+  if (userStore.userType == 'V') {
+      try {
+      const response = await axios.get('vcards/' + userStore.userId + '/categories')
+      categories.value = response.data.data
+    } catch (error) {
+      console.log(error)
+    }
   }
 }
 
@@ -27,79 +52,110 @@ const editTransaction = (transaction) => {
     router.push({ name: 'Transaction', params: { id: transaction.id } })
 }
 
-const deletedTransaction = (deletedTransaction) => {
-    let idx = transactions.value.findIndex((t) => t.id === deletedTransaction.id)
-    if (idx >= 0) {
-        transactions.value.splice(idx, 1)
-    }
-}
 
 const props = defineProps({
 TransactionsTitle: {
     type: String,
-    default: 'Transactions'
+    default: 'Transações (Todas)'
   },
   onlyCurrentTransactions: {
     type: Boolean,
     default: false
   }
 })
-
+const categories = ref([])
 const transactions = ref([])
-const filterByTransactionId = ref(-1)
-const filterByCompleted = ref(-1)
-const filterByType = ref(''); // 'Debit', 'Credit', or '' for all
+const filterByType = ref(-1); // 'Debit', 'Credit', or '' for all
 const sortBy = ref('date'); // 'date' or 'description'
 const filterByDescription = ref('')
+const currentPage = ref(1);
+const itemsPerPage = 10;
+const filterByDate = ref(null);
+const sortOrder = ref('asc'); // 'asc' or 'desc'
+const filterByTypePayment = ref(-1); 
+const filterByCategory = ref(-1);
 
 
 const filteredTransactions = computed(() => {
   let filtered = transactions.value;
 
   // Filter by transaction type
-  if (filterByType.value) {
+  if (filterByType.value != -1) {
     filtered = filtered.filter(t => t.type === filterByType.value);
   }
+
+  if (filterByTypePayment.value != -1) {
+    filtered = filtered.filter(t => t.payment_type === filterByTypePayment.value);
+  }
+  // Filter by description
   if (filterByDescription.value) {
     filtered = filtered.filter(t =>
       t.description && t.description.toString().includes(filterByDescription.value)
     );
   }
 
-  // Sort by date or description
-  // filtered = filtered.sort((a, b) => {
-  //   if (sortBy.value === 'date') {
-  //     return new Date(a.date) - new Date(b.date);
-  //   } else if (sortBy.value === 'description') {
-  //     return a.description.localeCompare(b.description);
-  //   }
-  //   return 0;
-  // });
+  // Filter by date
+  if (filterByDate.value != null) {
+    const selectedDate = new Date(filterByDate.value);
+    filtered = filtered.filter(t => {
+      const transactionDate = new Date(t.date);
+      return transactionDate >= selectedDate;
+    });
+  }
 
-  return filtered;
+  //Filter by category
+  if (filterByCategory.value != -1) {
+    filtered = filtered.filter(t => t.category_id === filterByCategory.value);
+  }
+
+  // Sorting
+  filtered = filtered.sort((a, b) => {
+    if (sortBy.value === 'date') {
+      return sortOrder.value === 'asc' ? new Date(a.date) - new Date(b.date) : new Date(b.date) - new Date(a.date);
+    } else if (sortBy.value === 'description') {
+      return sortOrder.value === 'asc' ? a.description.localeCompare(b.description) : b.description.localeCompare(a.description);
+    }
+    return 0;
+  });
+
+  const totalFiltered = filtered.length;
+  const start = (currentPage.value - 1) * itemsPerPage;
+  const end = Math.min(start + itemsPerPage, totalFiltered);
+  return filtered.slice(start, end);
 });
 
-const totalTransactions = computed( () => {
-  return transactions.value.length
-  
-})
+const totalPageCount = computed(() => {
+  return Math.ceil(transactions.value.length / itemsPerPage);
+});
+
+const updatePage = (direction) => {
+  if (direction === 'prev' && currentPage.value > 1) {
+    currentPage.value--;
+  } else if (direction === 'next' && currentPage.value < totalPageCount.value) {
+    currentPage.value++;
+    totalPageCount.value = Math.ceil(transactions.value.length / itemsPerPage);
+  }
+};
 
 
 onMounted (() => {
   loadTransactions()
+  loadCategories()
 })
 </script>
 
 <template>
   <div class="d-flex justify-content-between">
     <div class="mx-2">
-      <h3 class="mt-4">{{ tasksTitle }}</h3>
+      <h3 class="mt-4">{{ TransactionsTitle }}</h3>
     </div>
     <div class="mx-2 total-filtro">
       <h5 class="mt-4">Total: {{ totalTransactions }}</h5>
     </div>
   </div>
+  
   <hr>
+  <h3>Filtos:</h3>
   <div
     v-if="!onlyCurrentTasks"
     class="mb-3 d-flex justify-content-between flex-wrap"
@@ -114,9 +170,25 @@ onMounted (() => {
         id="selectType"
         v-model="filterByType"
       >
-        <option value="">All Types</option>
+        <option value="-1">Todos</option>
         <option value="D">Debit</option>
         <option value="C">Credit</option>
+      </select>
+    </div>
+    <div class="mx-2 mt-2 flex-grow-1 filter-div" v-show="userStore.userType === 'V'">
+      <label
+        for="selectType"
+        class="form-label"
+      >Categoria:</label>
+      <select
+        class="form-select"
+        id="selectType"
+        v-model="filterByCategory"
+      >
+        <option value="-1">Todos</option>
+        <option v-for="category in categories" :key="category.id" :value="category.id">
+          {{ category.name }}
+        </option>
       </select>
     </div>
     <div class="mx-2 mt-2 flex-grow-1 filter-div">
@@ -132,6 +204,40 @@ onMounted (() => {
         v-model="filterByDescription"
       >
     </div>
+    <div class="mx-2 mt-2 flex-grow-1 filter-div">
+      <label
+        for="date"
+        class="form-label"
+      >Data:</label>
+      <input type="date" v-model="filterByDate" class="form-select"
+        id="date" />
+    </div>
+    <div class="mx-2 mt-2 flex-grow-1 filter-div">
+      <label
+        for="typePayment"
+        class="form-label"
+      >Tipo Transação:</label>
+      <select class="form-select" id="typePayment" v-model="filterByTypePayment">
+        <option value="-1" >TODOS</option>
+        <option value="VCARD" >vCard</option>
+        <option value="MBWAY">MBWAY</option>
+        <option value="PAYPAL">PayPal</option>
+        <option value="IBAN">IBAN (Bank Transfer)</option>
+        <option value="MB">MB (Multibanco)</option>
+        <option value="VISA">Visa</option>
+      </select>
+    </div>
+    <div class="mx-2 mt-2 flex-grow-1 filter-div">
+      <label
+        for="order"
+        class="form-label"
+      >OrderBy:</label>
+      <select v-model="sortOrder" class="form-select"
+        id="order">
+        <option value="asc">Ascending</option>
+        <option value="desc">Descending</option>
+      </select>
+    </div>
     <div class="mx-2 mt-2">
       <button
         type="button"
@@ -145,8 +251,12 @@ onMounted (() => {
     :showId="true"
     :showOwner="false"
     @edit="editTransaction"
-    @deleted="deletedTransaction"
   ></transaction-table>
+  <div class="pagination-controls">
+    <button class="btn-pagination" @click="updatePage('prev')">Previous</button>
+    <span>Page {{ currentPage }} of {{ totalPageCount }}</span>
+    <button class="btn-pagination" @click="updatePage('next')">Next</button>
+  </div>
 </template>
 
 
@@ -159,5 +269,11 @@ onMounted (() => {
 }
 .btn-addtask {
   margin-top: 1.85rem;
+}
+
+.pagination-controls {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1em;
 }
 </style>

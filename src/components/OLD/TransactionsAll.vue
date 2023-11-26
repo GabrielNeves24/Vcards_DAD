@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router'
 import { useUserStore } from "../../stores/user.js"
 import { useTransactionsStore } from "../../stores/transactions.js"
 import { ref, computed, onMounted } from 'vue'
-import TransactionTable from "./TransactionTable.vue"
+import TransactionTable from "../transactions/TransactionTable.vue.js"
 
 const router = useRouter()
 const userStore = useUserStore()

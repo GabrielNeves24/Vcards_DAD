@@ -49,7 +49,7 @@
     if (!editingCategory.value) {
         return ''
       }
-      return props.operationType == 'insert' ? 'Nova Categoria' : 'Categoria #' + editingCategory.value.id
+      return props.operationType == 'insert' ? 'Nova Categoria' : 'Categoria ' + editingCategory.value.id
   })
 
   const save = () => {

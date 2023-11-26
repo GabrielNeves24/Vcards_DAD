@@ -8,7 +8,7 @@ const toast = useToast()
 const props = defineProps({
   categories: {
     type: Array,
-    //default: () => [],
+    default: () => [],
   },
   showId: {
     type: Boolean,
@@ -50,7 +50,15 @@ const editingCategories = ref(props.categories)
 //  watchEffect(() => {
 //    editingCategories.value = props.tasks
 //  })
-
+watch(
+  () => props.categories,
+  (newCategories) => {
+    editingCategories.value = newCategories
+  }
+)
+const editClick = (category) => {
+  emit("edit", category)
+}
 
  const deleteClick = (category) => {
   categoryToDelete.value = category
@@ -59,11 +67,17 @@ const editingCategories = ref(props.categories)
 
 
 const deleteCategoryConfirmed = async () => {
+  if (!categoryToDelete.value) {
+     console.error("No category selected for deletion");
+     return;
+   }
    try {
      const response = await axios.delete('vcards/' + categoryToDelete.value.vcard + '/categories/' + categoryToDelete.value.id)
-     let deletedcategory = response.data.data
+     let deletedCategory = response.data.data
      toast.info(`Categoria ${categoryToDeleteDescription.value} foi eliminada!`)
-     emit("deleted", deletedcategory)
+     console.log("1")
+     emit("deleted", deletedCategory)
+     console.log("2")
    } catch (error) {
      console.log(error)
      toast.error(`It was not possible to delete Task ${categoryToDeleteDescription.value}!`)
@@ -91,7 +105,7 @@ const deleteCategoryConfirmed = async () => {
         <th v-if="showId">#</th>
         <th>Tipo</th>
         <th>Nome</th>
-        <th v-if="showDeleteButton || showEditButton"></th>
+        <th v-if="showDeleteButton || showEditButton || showDeleteButton"></th>
       </tr>
     </thead>
     <tbody>
@@ -101,7 +115,7 @@ const deleteCategoryConfirmed = async () => {
         <td>{{ category.name }}</td>
         <td
           class="text-end"
-          v-if="showDeleteButton">
+          v-if="showCompletedButton || showEditButton || showDeleteButton">
           <div class="d-flex justify-content-end">
             <button
               class="btn btn-xs btn-light"

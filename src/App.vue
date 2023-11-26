@@ -118,10 +118,10 @@ const clickMenuOption = () => {
             <li v-show="userStore.userType == 'V'" class="nav-item d-flex justify-content-between align-items-center pe-3" >
               <router-link class="nav-link w-100 me-3" :class="{ active: $route.name === 'Transactions' }" 
                           :to="{ name: 'Transactions' }" @click="clickMenuOption">
-                <i class="bi bi-list-check"></i>
-                Transações
+                <i class="bi bi-files"></i>
+                Gestão Transações
               </router-link>
-              <router-link class="link-secondary" :to="{ name: 'NewTransaction' }" aria-label="Add a new task" v-show="userStore.userType == 'V' " @click="clickMenuOption"> 
+              <router-link class="link-secondary" :to="{ name: 'NewTransaction' }" aria-label="Add a new task" @click="clickMenuOption"> 
                 <i class="bi bi-xs bi-plus-circle"></i>
               </router-link>
             </li>
@@ -132,13 +132,13 @@ const clickMenuOption = () => {
                     Gestão VCards
                 </router-link>
             </li>
-            <li v-show="userStore.userType ==='A'" class="nav-item">
+            <!-- <li v-show="userStore.userType ==='A'" class="nav-item">
                 <router-link class="nav-link" :class="{ active: $route.name === 'TransactionsAll' }" 
                             :to="{ name: 'TransactionsAll' }" @click="clickMenuOption">
                   <i class="bi bi-files"></i>
                     Gestão Transacções
                 </router-link>
-            </li>
+            </li> -->
             <li class="nav-item" v-show="userStore.userType == 'A' " >
                 <router-link class="nav-link" :class="{ active: $route.name === 'Users' }" 
                             :to="{ name: 'Users' }" @click="clickMenuOption">

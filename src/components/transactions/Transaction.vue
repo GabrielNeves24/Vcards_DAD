@@ -32,7 +32,7 @@ const confirmationLeaveDialog = ref(null)
 // String with the JSON representation after loading the project (new or edit)
 let originalValueStr = ''
   
-const loadTask = async (id) => {
+const loadTransactions = async (id) => {
   originalValueStr = ''
   errors.value = null
   if (!id || (id < 0)) {
@@ -40,7 +40,7 @@ const loadTask = async (id) => {
     originalValueStr = JSON.stringify(transaction.value)
   } else {
       try {
-        const response = await axios.get('vcards/' + id + '/transactions/all')
+        const response = await axios.get('/transactions/' + id)
         transaction.value = response.data.data
         originalValueStr = JSON.stringify(transaction.value)
       } catch (error) {
@@ -70,7 +70,7 @@ const save = async () => {
     }
   } else {
     try {
-      const response = await axios.put('transactions/debit' + props.id, transaction.value)
+      const response = await axios.put('transactions', transaction.value)
       transaction.value = response.data.data
       originalValueStr = JSON.stringify(transaction.value)
       toast.success('Transação #' + transaction.value.id + ' was updated successfully.')
@@ -110,9 +110,11 @@ const operation = computed( () => (!props.id || props.id < 0) ? 'insert' : 'upda
 watch(
   () => props.id,
   (newValue) => {
-      loadTask(newValue)
+    loadTransactions(newValue)
+    console.log(newValue)
     }, 
   { immediate: true}
+  
 )
 
 let nextCallBack = null

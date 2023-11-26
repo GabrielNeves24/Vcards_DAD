@@ -36,7 +36,7 @@ const loadCategories = async (id) => {
     originalValueStr = JSON.stringify(category.value)
   } else {
       try {
-        const response = await axios.get('vcards/' + userStore.$id + '/categories')
+        const response = await axios.get('vcards/' + userStore.userId + '/categories/' + id)
         category.value = response.data.data
         originalValueStr = JSON.stringify(category.value)
       } catch (error) {
@@ -47,6 +47,7 @@ const loadCategories = async (id) => {
 
 const save = async () => {
   errors.value = null
+  console.log(category.value)
   if (operation.value == 'insert') {
     try {
       const response = await axios.post('vcards/'+ userStore.userId + '/categories', category.value)
@@ -57,24 +58,24 @@ const save = async () => {
     } catch (error) {
       if (error.response.status == 422) {
         errors.value = error.response.data.errors
-        toast.error('Catergoria was not created due to validation errors!')
+        toast.error('Catergoria não foi atualizada devido a erros de validação!')
       } else {
-        toast.error('Catergoria was not created due to unknown server error!')
+        toast.error('Catergoria não foi atualizada devido a erros desconhecidos!')
       }
     }
   } else {
     try {
-      const response = await axios.put('vcards/'+ userStore.userId + 'categories', category.value)
+      const response = await axios.put('vcards/'+ userStore.userId + '/categories', category.value)
       category.value = response.data.data
       originalValueStr = JSON.stringify(category.value)
-      toast.success('Transação #' + category.value.id + ' was updated successfully.')
+      toast.success('Categoria ' + category.value.id + ' atualizada com sucesso.')
       router.back()
     } catch (error) {
       if (error.response.status == 422) {
         errors.value = error.response.data.errors
-        toast.error('Transação #' + props.id + ' was not updated due to validation errors!')
+        toast.error('Categoria ' + props.id + ' não foi atualizada devido a erros de validação!')
       } else {
-        toast.error('Transação #' + props.id + ' was not updated due to unknown server error!')
+        toast.error('Categoria ' + props.id + ' não foi atualizada devido a erros desconhecidos!')
       }
     }
   }

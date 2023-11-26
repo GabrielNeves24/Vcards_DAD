@@ -40,11 +40,8 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(["completeToggled", "edit", "deleted"])
-
+const emit = defineEmits(["completeToggled", "edit"])
 const editingTransactions = ref(props.transactions)
-// const transactionToDelete = ref(null)
-// const deleteConfirmationDialog = ref(null)
 
 watch(
   () => props.transactions,
@@ -53,56 +50,13 @@ watch(
   }
 )
 
-// Alternative to previous watch
-// watchEffect(() => {
-//   editingTasks.value = props.tasks
-// })
-
-const toogleClick = async (task) => {
-    try {
-    const response = await axios.patch('tasks/' + task.id + '/completed', { completed: !task.completed })
-    task.completed = response.data.data.completed
-    emit("completeToggled", task)
-  } catch (error) {
-    console.log(error)
-  }
-}
 const editClick = (transaction) => {
   emit("edit", transaction)
 }
 
-// const deleteClick = (transaction) => {
-//   transactionToDelete.value = transaction
-//   deleteConfirmationDialog.value.show()
-// }
-
-// const deleteTaskConfirmed = async () => {
-//   try {
-//     const response = await axios.delete('tasks/' + transactionToDelete.value.id)
-//     let deletedTransaction = response.data.data
-//     toast.info(`Task ${taskToDeleteDescription.value} was deleted`)
-//     emit("deleted", deletedTransaction)
-//   } catch (error) {
-//     console.log(error)
-//     toast.error(`It was not possible to delete Task ${transactionToDeleteDescription.value}!`)
-//   }
-// }
-
-// const transactionToDeleteDescription = computed(() => taskToDelete.value
-//   ? `#${taskToDelete.value.id} (${taskToDelete.value.description})`
-//   : "")
-
 </script>
 
 <template>
-  <!-- <confirmation-dialog
-    ref="deleteConfirmationDialog"
-    confirmationBtn="Delete transaction"
-    :msg="`Do you really want to delete the task ${transactionToDeleteDescription}?`"
-    @confirmed="deleteTransactionConfirmed"
-  >
-  </confirmation-dialog> -->
-
   <table class="table">
     <thead>
       <tr>
@@ -115,7 +69,7 @@ const editClick = (transaction) => {
         <th>Value</th>
         <th>Old Balance</th>
         <th>Tipo Pagamento</th>
-        <th v-if="showCompletedButton || showEditButton || showDeleteButton" v-show="userStore.userType=='V'"></th>
+        <th v-if="showEditButton"></th>
       </tr>
     </thead>
     <tbody>
@@ -129,7 +83,7 @@ const editClick = (transaction) => {
         <td>{{ transaction.value }}</td>
         <td>{{ transaction.old_balance }}</td>
         <td>{{ transaction.payment_type }}</td>
-        <td v-show="userStore.userType=='V'"
+        <td 
           class="text-end"
           v-if="showEditButton">
           <div class="d-flex justify-content-end">

@@ -12,7 +12,7 @@ import Users from "../components/users/Users.vue"
 import Categories from "../components/categories/Categories.vue"
 import Category from "../components/categories/Category.vue"
 import Profile from "../components/auth/Profile.vue"
-import TransactionsAll from "../components/transactions/TransactionsAll.vue"
+//import TransactionsAll from "../components/OLD/TransactionsAll.vue.js"
 import NewTransactionCredit from "../components/transactions/TransactionCredit.vue"
 import DashboardAdmin from "../components/DashboardAdmin.vue"
 
@@ -64,34 +64,19 @@ const router = createRouter({
       name: 'DashboardAdmin',
       component: DashboardAdmin
     },
-    {
-      path: '/transactions',
-      name: 'Transactions',
-      component: Transactions,
-    },
-    {
-      path: '/transactions/all',
-      name: 'TransactionsAll',
-      component: TransactionsAll,
-    },
+    
+    // {
+    //   path: '/transactions/all',
+    //   name: 'TransactionsAll',
+    //   component: TransactionsAll,
+    // },
     {
       path: '/tasks/current',
       name: 'CurrentTasks',
       //component: Tasks,
       //props: { onlyCurrentTasks: true, tasksTitle: 'Current Tasks' }
     },
-    {
-      path: '/transactions/new',
-      name: 'NewTransaction',
-      component: Transaction,
-      props: { id: -1 }
-    },
-    {
-      path: '/transactions/credit/new',
-      name: 'NewTransactionCredit',
-      component: NewTransactionCredit,
-      props: { id: -1 }
-    },
+    
     {
       path: '/vcards',
       name: 'Vcards',
@@ -99,23 +84,65 @@ const router = createRouter({
     },
 
 
-
-
-
-
-
-
-     {
-       path: '/Categories',
-       name: 'Categories',
-       component: Categories,
-     },
-     {
-      path: '/Categories/edit/:id',
+    //categorias
+    {
+      path: '/categories',
+      name: 'Categories',
+      component: Categories,
+    },
+    {
+      path: '/categories/current',
+      name: 'CurrentCategories',
+      component: Categories,
+      props: { onlyCurrentCategories: true, categoriesTitle: 'Current Categories' }
+    },
+    {
+      path: '/categories/new',
+      name: 'NewCategory',
+      component: Category,
+      props: { id: -1 }
+    },
+    {
+      path: '/categories/:id',
       name: 'Category',
       component: Category,
-     
+      props: route => ({ id: parseInt(route.params.id) })
     },
+    //fim categorias
+
+    //transacoes
+
+
+    {
+      path: '/transactions/new',
+      name: 'NewTransaction',
+      component: Transaction,
+      props: { id: -1 }
+    },
+    {
+      path: '/transactions',
+      name: 'Transactions',
+      component: Transactions,
+    },
+    // {
+    //   path: '/transactions/debit/new',
+    //   name: 'NewTransactionDebit',
+    //   component: NewTransactionDebit,
+    //   props: { id: -1 }
+    // },
+    {
+      path: '/transactions/credit/new',
+      name: 'NewTransactionCredit',
+      component: Transaction,
+      props: { id: -1 }
+    },
+    {
+      path: '/transactions/:id',
+      name: 'Transaction',
+      component: Transaction,
+      props: route => ({ id: parseInt(route.params.id) })
+    },
+
 
 
 
@@ -132,12 +159,6 @@ const router = createRouter({
       path: '/projects',
       name: 'Projects',
       //component: Projects,
-    },
-    {
-      path: '/categorioes/new',
-      name: 'NewCategory',
-      component: Category,
-      props: { id: -1 }
     },
     {
       path: '/projects/:id',

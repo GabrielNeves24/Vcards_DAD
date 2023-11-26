@@ -94,7 +94,7 @@ const userStore = useUserStore()
     <h3 class="mt-5 mb-3">{{ transactionTitle }}</h3>
     <hr>
 
-    <div class="mb-3">
+    <div class="mb-3" v-show="operationType === 'insert'"> 
       <label
         for="value"
         class="form-label"
@@ -110,7 +110,7 @@ const userStore = useUserStore()
       >
       <field-error-message :errors="errors" fieldNumber="value"></field-error-message>
     </div>
-    <div class="mb-3" v-show="userStore.userType=='A'">
+    <div class="mb-3" v-show="userStore.userType=='A' && operationType === 'insert'">
       <label
         for="vcard"
         class="form-label"
@@ -124,7 +124,7 @@ const userStore = useUserStore()
       >
       <field-error-message :errors="errors" fieldName="vcard"></field-error-message>
     </div>
-    <div class="mb-3">
+    <div class="mb-3" v-show="operationType === 'insert'">
       <label
         for="payment_type"
         class="form-label"
@@ -144,7 +144,7 @@ const userStore = useUserStore()
       </select>
       <field-error-message :errors="errors" fieldName="payment_type"></field-error-message>
     </div>
-    <div class="mb-3" v-show="userStore.userType=='V'"> 
+    <div class="mb-3" v-show="userStore.userType=='V'" > 
       <label
         for="category_id"
         class="form-label"
@@ -161,7 +161,7 @@ const userStore = useUserStore()
       </select>
       <field-error-message :errors="errors" fieldName="category_id"></field-error-message>
     </div>
-    <div class="mb-3">
+    <div class="mb-3" v-show="operationType === 'insert'">
       <label
         for="payment_reference"
         class="form-label"
@@ -191,17 +191,33 @@ const userStore = useUserStore()
       ></textarea>
       <field-error-message :errors="errors" fieldName="description"></field-error-message>
     </div>
-    <div class="mb-3 d-flex justify-content-end">
-      <button
-        type="button"
-        class="btn btn-primary px-5"
-        @click="save"
-      >Efetuar Transação</button>
-      <button
-        type="button"
-        class="btn btn-light px-5"
-        @click="cancel"
-      >Cancelar</button>
+    <div v-show="operationType == 'insert'">
+      <div class="mb-3 d-flex justify-content-end">
+        <button
+          type="button"
+          class="btn btn-primary px-5"
+          @click="save"
+        >Efetuar Transação</button>
+        <button
+          type="button"
+          class="btn btn-light px-5"
+          @click="cancel"
+        >Cancelar</button>
+      </div>
+    </div>
+    <div v-show="operationType != 'insert'">
+      <div class="mb-3 d-flex justify-content-end">
+        <button
+          type="button"
+          class="btn btn-primary px-5"
+          @click="save"
+        >Alterar Transação</button>
+        <button
+          type="button"
+          class="btn btn-light px-5"
+          @click="cancel"
+        >Cancelar</button>
+      </div>
     </div>
   </form>
 </template>
