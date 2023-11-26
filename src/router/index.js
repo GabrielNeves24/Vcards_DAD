@@ -3,7 +3,7 @@ import { useUserStore } from "../stores/user.js"
 import HomeView from '../views/HomeView.vue'
 import Login from "../components/auth/Login.vue"
 import Register from "../components/auth/Register.vue"
-import ChangePassword from "../components/auth/ChangePassword.vue"
+import ChangePassword from "../components/auth/Passwords.vue"
 import Dashboard from "../components/Dashboard.vue"
 import Transaction from "../components/transactions/Transaction.vue"
 import Transactions from "../components/transactions/Transactions.vue"
@@ -29,9 +29,6 @@ const router = createRouter({
     {
       path: '/about',
       name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
       component: () => import('../views/AboutView.vue')
     },
     {
@@ -109,6 +106,34 @@ const router = createRouter({
       props: route => ({ id: parseInt(route.params.id) })
     },
     //fim categorias
+
+    //categorias admin
+    {
+      path: '/categories/defaults',
+      name: 'CategoriesDefaults',
+      component: Categories,
+    },
+    {
+      path: '/categories/defaults/current',
+      name: 'CurrentCategoriesDefaults',
+      component: Categories,
+      props: { onlyCurrentCategories: true, categoriesTitle: 'Current Categories' }
+    },
+    {
+      path: '/categories/defaults/new',
+      name: 'NewCategoryDefaults',
+      component: Category,
+      props: { id: -1 }
+    },
+    {
+      path: '/categories/defaults/:id',
+      name: 'CategoryDefaults',
+      component: Category,
+      props: route => ({ id: parseInt(route.params.id) })
+    },
+    //fim categorias
+
+
 
     //transacoes
 

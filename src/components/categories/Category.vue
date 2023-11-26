@@ -22,6 +22,7 @@ const newCategory = () => {
   }
 }
 
+
 const category = ref(newCategory())
 const errors = ref(null)
 const confirmationLeaveDialog = ref(null)
@@ -31,41 +32,59 @@ let originalValueStr = ''
 const loadCategories = async (id) => {
   originalValueStr = ''
   errors.value = null
-  if (!id || (id < 0)) {
-    category.value = newCategory()
-    originalValueStr = JSON.stringify(category.value)
-  } else {
+  // if (!id || (id < 0)) {
+  //   category.value = newCategory()
+  //   originalValueStr = JSON.stringify(category.value)
+  // } else {
+    if (userStore.userType == 'A'){
       try {
-        const response = await axios.get('vcards/' + userStore.userId + '/categories/' + id)
+        const response = await axios.get('categories/defaults/' + id)
         category.value = response.data.data
         originalValueStr = JSON.stringify(category.value)
       } catch (error) {
         console.log(error)
       }
-  }
+    }else{
+        try {
+          const response = await axios.get('vcards/' + userStore.userId + '/categories/' + id)
+          category.value = response.data.data
+          originalValueStr = JSON.stringify(category.value)
+        } catch (error) {
+          console.log(error)
+        }
+      }
 }
 
 const save = async () => {
   errors.value = null
+  let response = null;
   console.log(category.value)
   if (operation.value == 'insert') {
     try {
-      const response = await axios.post('vcards/'+ userStore.userId + '/categories', category.value)
+      if (userStore.userType == 'V'){
+       response = await axios.post('vcards/'+ userStore.userId + '/categories', category.value)
+      }else{
+         response = await axios.post('categories/defaults', category.value)
+      }
       category.value = response.data.data
       originalValueStr = JSON.stringify(category.value)
-      toast.success('Catergoria #' + category.value.id + ' criada com sucesso')
+      toast.success('Categoria ' + category.value.id + ' criada com sucesso')
       router.back()
     } catch (error) {
       if (error.response.status == 422) {
         errors.value = error.response.data.errors
-        toast.error('Catergoria não foi atualizada devido a erros de validação!')
+        toast.error('Categoria não foi atualizada devido a erros de validação!')
       } else {
-        toast.error('Catergoria não foi atualizada devido a erros desconhecidos!')
+        toast.error('Categoria não foi atualizada devido a erros desconhecidos!')
       }
     }
   } else {
     try {
-      const response = await axios.put('vcards/'+ userStore.userId + '/categories', category.value)
+      if (userStore.userType == 'V'){
+        response = await axios.put('vcards/'+ userStore.userId + '/categories', category.value)
+      }else{
+        response = await axios.put('categories/defaults/'+ category.value.id, category.value)
+      }
       category.value = response.data.data
       originalValueStr = JSON.stringify(category.value)
       toast.success('Categoria ' + category.value.id + ' atualizada com sucesso.')

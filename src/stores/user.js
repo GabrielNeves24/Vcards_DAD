@@ -73,41 +73,107 @@ export const useUserStore = defineStore('user', () => {
         }
     } 
 
-    async function profile(formData) {
-        try {
+    async function profile(credentialsProfile,texto) {
+        if (texto == 'perfil') {
+            try {
+                if(userType.value == 'A'){
+                    try{
+                        const response = await axios.put('users/perfil/' + userId.value, credentialsProfile);
+                        return true;
+                    }catch(error){
+                        return false;
+                    }
+                }else{
+                    try{
+                        const response = await axios.put('vcards/perfil/' + userId.value, credentialsProfile, {
+                            headers: {
+                                'Content-Type': 'multipart/form-data'
+                            }
+                        });
+                        return true;
+                    }catch(error){
+                        return false;
+                    }
+                }
+            } catch(error) {
+                return false;
+            }
+        } else {
             if(userType.value == 'A'){
                 try{
-                    const response = await axios.put('users/' + userId.value, formData);
+                    const response = await axios.put('users/password/' + userId.value, credentialsProfile);
+                    // const newCredentials = {
+                    //     username: userId.value,
+                    //     password: credentialsProfile.value.password
+                    // };
+                    // await login(newCredentials);
                 }catch(error){
                     return false;
                 }
             }else{
                 try{
-                    const response = await axios.put('vcards/' + userId.value, formData, {
-                        headers: {
-                            'Content-Type': 'multipart/form-data'
-                        }
-                    });
+                    //send only credentialsProfile.value.password and userId.value and credentialsProfile.value.confirmation_code
+                    const credentialToSend ={
+                        password: credentialsProfile.value.password,
+                        confirmation_code: credentialsProfile.value.confirmation_code,
+                        id : userId.value
+                    }
+                    const response = await axios.put('vcards/password/' + userId.value, credentialToSend);
+                    // const newCredentials = {
+                    //     username: userId.value,
+                    //     password: credentialsProfile.value.password
+                    // };
+                    // console.log(newCredentials);
+                    // // Perform a new login with the updated credentials
+                    // await logout();
+                    // await login(newCredentials);
                 }catch(error){
                     return false;
                 }
             }
-            // Check if the password was changed
-            if (formData.password) {
-                // Prepare new login credentials
-                const newCredentials = {
-                    username: userId.value, 
-                    password: formData.password
-                };
+        }
+            
+        // try {
+        //     if(userType.value == 'A'){
+        //         try{
+        //             const response = await axios.put('users/' + userId.value, formData);
+        //         }catch(error){
+        //             return false;
+        //         }
+        //     }else{
+        //         try{
+        //             const response = await axios.put('vcards/' + userId.value, formData, {
+        //                 headers: {
+        //                     'Content-Type': 'multipart/form-data'
+        //                 }
+        //             });
+        //         }catch(error){
+        //             return false;
+        //         }
+        //     }
+        //     // Check if the password was changed
+        //     if (formData.password) {
+        //         // Prepare new login credentials
+                
+        //     } else {
+        //         // If password wasn't changed, just reload user data
+        //         //await loadUser();
+        //     }
     
-                // Perform a new login with the updated credentials
-                await login(newCredentials);
-            } else {
-                // If password wasn't changed, just reload user data
-                //await loadUser();
-            }
-    
-            return true;
+        //     return true;
+        // } catch (error) {
+        //     return false;
+        // }
+    }
+
+    async function verifyPassword(password) {
+        try {
+            const response = await axios.post('/verify-password', {
+                enteredPassword: password,
+                user: userId.value,
+                userType: userType.value
+            });
+            return response.data.isValid;
         } catch (error) {
             return false;
         }
@@ -136,14 +202,14 @@ export const useUserStore = defineStore('user', () => {
         return false
     }
     
-    async function validatePassword (password) {
-        try {
-            const response = await axios.put('verify-password' + userId.value, password);
-            return true;
-        } catch (error) {   
-            return false;
-        }
-    }
+    // async function validatePassword (password) {
+    //     try {
+    //         const response = await axios.put('verify-password' + userId.value, password);
+    //         return true;
+    //     } catch (error) {   
+    //         return false;
+    //     }
+    // }
 
     return {
         user,
@@ -158,5 +224,6 @@ export const useUserStore = defineStore('user', () => {
         restoreToken,
         userType,
         profile,
+        verifyPassword,
     }
 })

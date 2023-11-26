@@ -9,20 +9,38 @@ const router = useRouter()
 const userStore = useUserStore()
 
 const loadCategories = async () => {
-  try {
-    const response = await axios.get('vcards/' + userStore.userId + '/categories')
-    categories.value = response.data.data
-  } catch (error) {
-    console.log(error)
+ if (userStore.userType == 'A'){
+    try {
+      const response = await axios.get('categories/defaults')
+      categories.value = response.data.data
+    } catch (error) {
+      console.log(error)
+    }
+  }else{
+      try {
+        const response = await axios.get('vcards/' + userStore.userId + '/categories')
+        categories.value = response.data.data
+      } catch (error) {
+        console.log(error)
+      }
   }
 }
 
 const addCategory = () => {
-    router.push({ name: 'NewCategory' })
+    if (userStore.userType == 'A'){
+      router.push({ name: 'CategoryDefaults', params: { id: -1 } })
+    }else{
+      router.push({ name: 'Category', params: { id: -1 } })
+    }
 }
 
 const editCategory = (categories) => {
+  if (userStore.userType == 'A'){
+    router.push({ name: 'CategoryDefaults', params: { id: categories.id } })
+  }else{
     router.push({ name: 'Category', params: { id: categories.id } })
+  }
+  
 }
 
 const deletedCategory = () => {
@@ -32,7 +50,7 @@ const deletedCategory = () => {
 const props = defineProps({
   categoriesTitle: {
     type: String,
-    default: 'Categories'
+    default: 'Categorias'
   },
   onlyCurrentCategories: {
     type: Boolean,

@@ -2,8 +2,12 @@
 import axios from 'axios'
 import { useToast } from "vue-toastification"
 import { ref, watch, computed } from "vue"
+import { useUserStore } from '../../stores/user';
+import { useRouter } from 'vue-router'
 
 const toast = useToast()
+const userStore = useUserStore()
+const router = useRouter()
 
 const props = defineProps({
   categories: {
@@ -68,20 +72,30 @@ const editClick = (category) => {
 
 const deleteCategoryConfirmed = async () => {
   if (!categoryToDelete.value) {
-     console.error("No category selected for deletion");
+     console.error("Sem categoria para eliminar");
      return;
    }
-   try {
-     const response = await axios.delete('vcards/' + categoryToDelete.value.vcard + '/categories/' + categoryToDelete.value.id)
-     let deletedCategory = response.data.data
-     toast.info(`Categoria ${categoryToDeleteDescription.value} foi eliminada!`)
-     console.log("1")
-     emit("deleted", deletedCategory)
-     console.log("2")
-   } catch (error) {
-     console.log(error)
-     toast.error(`It was not possible to delete Task ${categoryToDeleteDescription.value}!`)
-   }
+   if (userStore.userType == 'A'){
+     try {
+       await axios.delete('categories/defaults/' + categoryToDelete.value.id)
+       emit("deleted", categoryToDelete.value)
+       toast.success("Cetergoria eliminada com sucesso")
+       router.push({ name: 'CategoriesDefaults' })
+     } catch (error) {
+       console.log(error)
+       toast.error("Erro a eliminar a categoria")
+     }
+    }else{
+       try {
+         await axios.delete('vcards/' + userStore.userId + '/categories/' + categoryToDelete.value.id)
+         emit("deleted", categoryToDelete.value)
+         toast.success("Cetergoria eliminada com sucesso")
+         router.push({ name: 'Categories' })
+       } catch (error) {
+         console.log(error)
+         toast.error("Erro a eliminar a categoria")
+       }
+     }
  }
 
  const categoryToDeleteDescription = computed(() => categoryToDelete.value
@@ -93,8 +107,8 @@ const deleteCategoryConfirmed = async () => {
 <template>
    <confirmation-dialog
     ref="deleteConfirmationDialog"
-    confirmationBtn="Delete category"
-    :msg="`Do you really want to delete the task ${categoryToDeleteDescription}?`"
+    confirmationBtn="Eliminar categoria"
+    :msg="`Deseja eliminar a categoria ${categoryToDeleteDescription}?`"
     @confirmed="deleteCategoryConfirmed"
   >
   </confirmation-dialog>
