@@ -5,20 +5,23 @@
       <div class="transaction-date">{{ formatDate(date) }}</div>
       <div class="transaction-list">
         <!-- Transaction list for each date -->
-        <div v-for="transaction in groupedTransactions" :key="transaction.id" class="transaction-card">
+        <div v-for="transaction in groupedTransactions" :key="transaction.id" class="transaction-card" @click="toggleTransactionDetails(transaction.id)">
           <!-- Transaction Card Content -->
           <div class="transaction-card-content">
             <div class="transaction-card-info">
               <div class="transaction-payment_reference">{{ transaction.payment_reference }}</div>
               <div class="transaction-category">{{ transaction.category }}</div>
             </div>
-            <div class="transaction-description">{{ transaction.description }}</div>
+            <!-- <div class="transaction-description">{{ transaction.description }}</div> -->
             <div class="transaction-card-info">
-              <div class="transaction-type">
+              <div class="transaction-type" :class="{'positive-value': transaction.type !== 'D', 'negative-value': transaction.type === 'D'}">
                 {{ transaction.type === 'D' ? (transaction.value * -1) : transaction.value }}
               </div>
-              <div class="transaction-old_balance">{{ transaction.old_balance }}</div>
+              <div class="transaction-old_balance">({{ transaction.old_balance }})</div>
             </div>
+          </div>
+          <div v-if="isTransactionSelected(transaction.id)" class="transaction-details">
+            Descrição: {{ transaction.description === null ? 'Sem descrição' : transaction.description }}
           </div>
         </div>
       </div>
@@ -37,6 +40,15 @@
   const transactions = ref([]);
   const categoriesAll = ref([]);
   const isRecentTransactionsOpen = ref(true); // or whatever logic you use to toggle this
+  const selectedTransactionId = ref(null);
+  
+  const toggleTransactionDetails = (transactionId) => {
+    selectedTransactionId.value = selectedTransactionId.value === transactionId ? null : transactionId;
+  };
+
+  const isTransactionSelected = (transactionId) => {
+    return selectedTransactionId.value === transactionId;
+  };
   
   onMounted(async () => {
     try {
@@ -92,6 +104,7 @@
     padding: 0.5rem;
     margin-bottom: 0.5rem;
     border-radius: 0.25rem;
+    cursor: pointer;
   }
   
   .transaction-card-content {
@@ -112,5 +125,28 @@
   .transaction-old_balance {
     margin-bottom: 0.25rem;
   }
+  .transaction-old_balance {
+    font-size: 12px;
+    text-align: right;
+  }
+
+  .transaction-type {
+    color: #333;
+    font-weight: bold;
+    text-align: right;
+  }
+
+  .positive-value {
+  color: green;
+}
+
+.negative-value {
+  color: red;
+}
+
+.transaction-details {
+  margin-top: 10px;
+  font-style: italic;
+}
   </style>
   

@@ -7,6 +7,7 @@ import { useRouter } from 'vue-router'
 import { useUserStore } from '../stores/user.js'
 import RecentTransactions from '../components/transactions/RecentTransactions.vue';
 import SpendingChart from '../components/transactions/SpendingChart.vue'
+import MonthlyTransactionsChart from './charts/MonthlyTransactionsChart.vue'
 
 
 const toast = useToast()
@@ -20,7 +21,7 @@ const errors = ref(null)
 
 const loadVcard = async () => {
   try {
-    const response = await axios.get('vcards/' + userStore.userId)
+    const response = await axios.get('users/' + userStore.userId)
     vcards.value = response.data.data
     console.log(vcards.value)
   } catch (error) {
@@ -52,7 +53,8 @@ onMounted(() => {
         <h2 class="section-title">Transações</h2>
         <div class="vcard-list">
           <div class="vcard">
-            <SpendingChart />
+            <MonthlyTransactionsChart 
+             />
             <!-- Add more card details here -->
           </div>
         </div>
@@ -61,7 +63,7 @@ onMounted(() => {
         <h2 class="section-title">Transações recentes</h2>
         <div class="vcard-list">
           <div class="vcard">
-            <RecentTransactions />
+            <!-- <RecentTransactions /> -->
             <!-- Add more card details here -->
           </div>
         </div>
