@@ -55,11 +55,28 @@ const userStore = useUserStore()
     if (!editingTransaction.value) {
         return ''
       }
-      return props.operationType == 'insert' ? 'Nova Transação' : 'Transação ' + editingTransaction.value.id
+      if(userStore.userType == 'A'){
+        return props.operationType == 'insert' ? 'Nova Transação Crédito' : 'Transação ' + editingTransaction.value.id
+      }else{
+        return props.operationType == 'insert' ? 'Nova Transação Débito' : 'Transação ' + editingTransaction.value.id
+      }
   })
 
   const save = () => {
-    emit('save', editingTransaction.value)
+    if (!validatePaymentReference()) {
+      toast.error('Invalid Payment Reference!');
+      return;
+  }
+  if (userStore.userType === 'V') {
+    if (editingTransaction.value.value <= 0 || 
+        editingTransaction.value.value > userStore.userBalance || 
+        editingTransaction.value.value > userStore.userMaxDebit) {
+      toast.error('Invalid transaction value. Must be greater than 0 and within allowed limits.');
+      return;
+    }
+  }
+
+  emit('save', editingTransaction.value);
   }
 
   const cancel = () => {
@@ -77,11 +94,50 @@ const userStore = useUserStore()
     }
   }
 
+  const vcardsNumbers = ref([])
+  const fetchVcardsNumbers = async () => {
+    try {
+      const response = await axios.get('vcards')
+      //get only vcards numbers
+      vcardsNumbers.value = response.data.data;
+      console.log(vcardsNumbers.value);
+    } catch (error) {
+      toast.error('Error fetching categories!')
+    }
+  }
+
+  const validatePaymentReference = () => {
+  const ref = editingTransaction.value.reference;
+  const type = editingTransaction.value.type;
+
+  switch (type) {
+    case 'VCARD':
+      return /^\d{9}$/.test(ref) && ref.startsWith('9'); // 9 digits, starts with 9
+    case 'MBWAY':
+      return /^\d{9}$/.test(ref) && ref.startsWith('9'); // 9 digits, starts with 9
+    case 'PAYPAL':
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ref); // valid email format
+    case 'IBAN':
+      return /^[A-Z]{2}\d{23}$/.test(ref); // 2 letters followed by 23 digits
+    case 'MB':
+      return /^\d{5}-\d{9}$/.test(ref); // 5 digits, hyphen, 9 digits
+    case 'VISA':
+      return /^\d{16}$/.test(ref) && ref.startsWith('4'); // 16 digits, starts with 4
+    default:
+      return false;
+  }
+};
+
+
   onMounted(() => {
     if (userStore.userType == 'V') {
      
     fetchCategories()
+    
+    }else{
+      fetchVcardsNumbers()
     }
+    
   })
 </script>
 
@@ -114,35 +170,38 @@ const userStore = useUserStore()
       <label
         for="vcard"
         class="form-label"
-      >Numero VCard</label>
-      <input
-        type = "number"
-        class="form-control"
-        :class="{ 'is-invalid': errors ? errors['vcard'] : false }"
-        id="vcard"
-        v-model="editingTransaction.vcard"
-      >
+      >Numero VCard Destino Credito</label>
+        <select
+          class="form-select"
+          :class="{ 'is-invalid': errors ? errors['vcard'] : false }"
+          id="vcard"
+          v-model="editingTransaction.vcard"
+        >
+          <option v-for="vcardsNumber in vcardsNumbers" :key="vcardsNumber.phone_number" :value="vcardsNumber.phone_number">
+            {{ vcardsNumber.phone_number }}
+          </option>
+        </select>
       <field-error-message :errors="errors" fieldName="vcard"></field-error-message>
     </div>
     <div class="mb-3" v-show="operationType === 'insert'">
       <label
-        for="payment_type"
+        for="type"
         class="form-label"
       >Tipo Transação</label>
       <select
         class="form-select"
-        :class="{ 'is-invalid': errors ? errors['payment_type'] : false }"
-        id="payment_type"
-        v-model="editingTransaction.payment_type"
+        :class="{ 'is-invalid': errors ? errors['type'] : false }"
+        id="type"
+        v-model="editingTransaction.type"
       >
-          <option value="VCARD" >vCard</option>
+          <option value="VCARD" v-show="userStore.userType=='V'" >vCard</option>
           <option value="MBWAY">MBWAY</option>
           <option value="PAYPAL">PayPal</option>
           <option value="IBAN">IBAN (Bank Transfer)</option>
           <option value="MB">MB (Multibanco)</option>
           <option value="VISA">Visa</option>
       </select>
-      <field-error-message :errors="errors" fieldName="payment_type"></field-error-message>
+      <field-error-message :errors="errors" fieldName="type"></field-error-message>
     </div>
     <div class="mb-3" v-show="userStore.userType=='V'" > 
       <label
@@ -163,19 +222,19 @@ const userStore = useUserStore()
     </div>
     <div class="mb-3" v-show="operationType === 'insert'">
       <label
-        for="payment_reference"
+        for="reference"
         class="form-label"
       >Referencia</label>
       <input
         type="text"
         class="form-control"
-        :class="{'is-invalid': errors ? errors['payment_reference']: false}"
-        id="payment_reference"
+        :class="{'is-invalid': !validatePaymentReference() && errors}"
+        id="reference"
         placeholder="Referencia da Transação"
         required
-        v-model="editingTransaction.payment_reference"
+        v-model="editingTransaction.reference"
       >
-      <field-error-message :errors="errors" fieldName="payment_reference"></field-error-message>
+      <field-error-message :errors="errors" fieldName="reference"></field-error-message>
     </div>
     <div class="mb-3">
       <label

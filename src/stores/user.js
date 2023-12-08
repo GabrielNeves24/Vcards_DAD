@@ -18,6 +18,10 @@ export const useUserStore = defineStore('user', () => {
 
     const userEmail = computed(() => user.value?.email ?? -1)
 
+    const userMaxDebit = computed(() => user.value?.max_debit ?? 0)
+
+    const userBalance = computed(() => user.value?.balance ?? 0)
+
     const userType = computed(() => user.value?.user_type ?? -1)
 
   
@@ -172,6 +176,8 @@ export const useUserStore = defineStore('user', () => {
         userId,
         userName,
         userPhotoUrl,
+        userMaxDebit,
+        userBalance,
         loadUser,
         clearUser,
         login,

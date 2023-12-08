@@ -17,10 +17,10 @@ const newTransaction = () => {
   return {
     id: null,
     vcard: null,
-    type: 'C',
+    //type: 'C',
     value: null,
-    payment_type: null,
-    payment_reference: null,
+    type: null,
+    reference: null,
     description: null,
   }
 }

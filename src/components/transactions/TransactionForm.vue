@@ -23,58 +23,7 @@ const toggleDebitTransaction = () => {
 const emit = defineEmits(['updateTransactions']); // Define the event to be emitted
 const emitUpdate = () => emit('updateTransactions');
 
-const makeDebitTransaction = async () => {
-  try {
-    // Validate the transaction value
-    if (parseFloat(transactionValue.value) <= 0) {
-      alert('Transaction value must be greater than 0.');
-      return;
-    }
 
-    // Validate the transaction value against the vCard balance and max_debit
-    const vCardBalance = parseFloat(vcards.value.balance);
-    const maxDebit = parseFloat(vcards.value.max_debit);
-    if (parseFloat(transactionValue.value) > vCardBalance) {
-      alert('Transaction value exceeds the vCard balance.');
-      return;
-    }
-    if (parseFloat(transactionValue.value) > maxDebit) {
-      alert('Transaction value exceeds the maximum debit limit.');
-      return;
-    }
-    const currentDate = new Date().toISOString().split('T')[0]; // Format as 'YYYY-MM-DD'
-    const currentDatetime = new Date().toISOString().replace('T', ' ').replace('Z', ''); // Format as 'YYYY-MM-DD HH:MM:SS'
-
-    const response = await axios.post('/transactions/debit', {
-      vcard: vcards.value.phone_number,
-      date: currentDate,
-      datetime: currentDatetime,
-      type: 'D',
-      value: transactionValue.value, // Use transactionValue.value
-      old_balance: vcards.value.balance,
-      new_balance: vcards.value.balance - transactionValue.value, // Use transactionValue.value
-      payment_type: payment_type.value, // Assuming payment_type is also a ref
-      payment_reference: transactionReference.value, // Use transactionReference.value
-      pair_transaction: null,
-      pair_vcard: null,
-      category_id: selectedCategory.value, // Assuming selectedCategory is also a ref
-      description: transactiondescription.value, // Use transactiondescription.value
-    });
-    if (response.status === 201) {
-      alert(response.data.message);
-      //fetchRecentTransactions();
-      //fetchRecentTransactions(); // Refresh transactions
-      emit('transactionMade'); // Emitting an event
-      toggleDebitTransaction(); // Hide the debit transaction form
-
-    } else {
-      alert('Error creating debit transaction.');
-    }
-  } catch (error) {
-    console.error('Error creating debit transaction:', error);
-    alert('Error creating debit transaction. Please try again.');
-  }
-}
 
 
 // Add your transaction logic here

@@ -16,12 +16,11 @@ const transactionStore = useTransactionsStore()
 const newTransaction = () => { 
   return {
     id: null,
-    vcard: userStore.userId,
-    //type C or D,
-    type: null,
+    vcard: null,
+    //type: null,
     value: null,
-    payment_type: null,
-    payment_reference: null,
+    type: null,
+    reference: null,
     category_id: null,
     description: null,
   }
@@ -57,22 +56,80 @@ const save = async () => {
       console.log(transaction.value)
       //add type to transaction
       if (userStore.userType == 'A'){
-        transaction.value.type = 'C'
-        const response = await axios.post('transactions/credit', transaction.value)
-        transaction.value = response.data.data
-        //console.log(transaction.value)
-        originalValueStr = JSON.stringify(transaction.value)
-        toast.success('Transação criada com sucesso!')
-        router.back()
-        router.push({ name: 'Transactions' })
+        try {
+          const response = await axios.post(`https://dad-202324-payments-api.vercel.app/api/credit`, {
+            type: transaction.value.type,
+            reference: transaction.value.reference,
+            value: transaction.value.value,
+          });
+          if (response.status === 201) {
+            toast.success('Transaction processed successfully! na api');
+            //transaction.value.type = 'C'
+            const response = await axios.post('transactions/credit', {
+              vcard: transaction.value.vcard,
+              payment_type: transaction.value.type,
+              value: transaction.value.value,
+              payment_reference: transaction.value.reference,
+              category_id: transaction.value.category_id,
+              description: transaction.value.description,
+            })
+            transaction.value = response.data.data
+            //console.log(transaction.value)
+            originalValueStr = JSON.stringify(transaction.value)
+            toast.success('Transação criada com sucesso!')
+            router.back()
+            router.push({ name: 'Transactions' })
+          }
+        } catch (error) {
+          toast.error(`Error: ${error.response.data.message}`);
+          return false;
+        }
       }else{
-        transaction.value.type = 'D'
-        const response = await axios.post('transactions/debit', transaction.value)
-        transaction.value = response.data.data
-        //console.log(transaction.value)
-        originalValueStr = JSON.stringify(transaction.value)
-        toast.success('Transação criada com sucesso!')
-        router.push({ name: 'Transactions' })
+          
+        if(transaction.value.type == 'VCARD'){
+          //transaction.value.type = 'D'
+          const response = await axios.post('transactions/debit', {
+                vcard: userStore.userId,
+                payment_type: transaction.value.type,
+                value: transaction.value.value,
+                payment_reference: transaction.value.reference,
+                category_id: transaction.value.category_id,
+                description: transaction.value.description,
+              })
+          transaction.value = response.data.data
+          //console.log(transaction.value)
+          originalValueStr = JSON.stringify(transaction.value)
+          toast.success('Transação criada com sucesso!')
+          router.push({ name: 'Transactions' })
+        }else{
+          try {
+            const response = await axios.post(`https://dad-202324-payments-api.vercel.app/api/debit`, {
+              type: transaction.value.type,
+              reference: transaction.value.reference,
+              value: transaction.value.value,
+            });
+            if (response.status === 201) {
+              toast.success('Transaction processed successfully! na api');
+              //transaction.value.type = 'D'
+              const response = await axios.post('transactions/debit', {
+                vcard: userStore.userId,
+                payment_type: transaction.value.type,
+                value: transaction.value.value,
+                payment_reference: transaction.value.reference,
+                category_id: transaction.value.category_id,
+                description: transaction.value.description,
+              })
+              transaction.value = response.data.data
+              //console.log(transaction.value)
+              originalValueStr = JSON.stringify(transaction.value)
+              toast.success('Transação criada com sucesso!')
+              router.push({ name: 'Transactions' })
+            }
+          } catch (error) {
+            toast.error(`Error: ${error.response.data.message}`);
+            return false;
+          }
+        }
       }      
     } catch (error) {
       if (error.response.status == 422) {
