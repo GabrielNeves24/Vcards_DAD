@@ -28,30 +28,29 @@ const register = async () => {
     for (const key in credentialsRegsiter.value) {
         formData.append(key, credentialsRegsiter.value[key]);
     }
-
-    try {
-        const response = await userStore.register(formData);
-        if (response === true) {
-            toast.success('Vcard ' + credentialsRegsiter.value.phone_number + ' criado com sucesso.');
-            router.push({ name: 'Login' });
-        }
-    } catch (error) {
-        toast.error('Erro ao criar Vcard!');
+    const error = await userStore.register(formData);
+    if(error === true) {
+        toast.success('Vcard ' + credentialsRegsiter.value.phone_number + ' criado com sucesso.');
+        router.push({ name: 'Login' });
+    } else{
         handleApiErrors(error);
         credentialsRegsiter.value.password = '';
     }
 };
 
 function handleApiErrors(error) {
-    if (error.response && error.response.data && error.response.data.error) {
-        if (Array.isArray(error.response.data.error)) {
-            // If the error is an array (multiple messages)
+    if (error.response && error.response.data) {
+        if (error.response.data.error && Array.isArray(error.response.data.error)) {
+            // If the error is an array of messages
             error.response.data.error.forEach(message => {
                 toast.error(message);
             });
-        } else {
-            // Single error message
+        } else if (error.response.data.error) {
+            // If it's a single error message
             toast.error(error.response.data.error);
+        } else {
+            // General error message
+            toast.error('An unexpected error occurred!');
         }
     } else {
         // Fallback error message

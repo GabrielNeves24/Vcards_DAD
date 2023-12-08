@@ -18,8 +18,6 @@ export const useUserStore = defineStore('user', () => {
 
     const userEmail = computed(() => user.value?.email ?? -1)
 
-    const userMaxDebit = computed(() => user.value?.max_debit ?? 0)
-
     const userBalance = computed(() => user.value?.balance ?? 0)
 
     const userType = computed(() => user.value?.user_type ?? -1)
@@ -99,28 +97,34 @@ export const useUserStore = defineStore('user', () => {
 
  
 
-    async function profile(credentialsProfile,texto) {
+    async function profile(credentialsProfile) {
         try {
-            if(userType.value == 'A'){
-                try{
-                    
-                    const response = await axios.put('users/perfil/' + userId.value, credentialsProfile.value);
-                    loadUser();
-                    return true;
-                }catch(error){
-                    return false;
+
+                if(userType.value == 'A'){
+                    try{
+                        
+                        const response = await axios.put('users/perfil/' + userId.value, credentialsProfile);
+                        loadUser();
+                        return true;
+                    }catch(error){
+                        return false;
+                    }
+                }else{
+                    try {
+                        const response = await axios.post(`vcards/${userId.value}`, credentialsProfile, {
+                            headers: {
+                              "Content-Type": "multipart/form-data",
+                            },
+                          });
+                        loadUser(); // Reload user data if necessary
+                        console.log(response);
+                        return true;
+                    } catch (error) {
+                        console.error(error);
+                        return false;
+                    }
                 }
-            }else{
-                try {
-                    const response = await axios.put(`vcards/${userId.value}`, credentialsProfile.value);
-                    loadUser(); // Reload user data if necessary
-                    console.log(response);
-                    return true;
-                } catch (error) {
-                    console.error(error);
-                    return false;
-                }
-            }
+            
         } catch(error) {
             return false;
         }
@@ -176,7 +180,6 @@ export const useUserStore = defineStore('user', () => {
         userId,
         userName,
         userPhotoUrl,
-        userMaxDebit,
         userBalance,
         loadUser,
         clearUser,

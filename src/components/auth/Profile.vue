@@ -38,7 +38,11 @@ const profile = async () => {
     //if only alter name and email do the followingprofile
     if (initialData.name != credentialsProfile.value.name || initialData.email != credentialsProfile.value.email || credentialsProfile.value.photo_url != null) {
       //console.log(await userStore.profile(credentialsProfile,'perfil'))
-      if (await userStore.profile(credentialsProfile,'perfil')) {
+      const formData = new FormData();
+      for (const key in credentialsProfile.value) {
+          formData.append(key, credentialsProfile.value[key]);
+      }
+      if (await userStore.profile(formData)) {
         toast.success('Perfil atualizado com sucesso.');
         //emit('profile');
         router.push({ name: 'Dashboard' });
@@ -116,8 +120,8 @@ onMounted(() => {
         </form>
       </div>
       <div v-if="userStore.userType == 'V'" class="col-md-6 d-flex align-items-center justify-content-center" >
-        <img :src="userStore.userPhotoUrl" alt="Vcard Foto" class="img-fluid rounded-circle" style="max-width: 200px;">
-        <input type="file" accept="image/*" @change="handleFileUpload">
+        <img :src="userStore.userPhotoUrl" alt="Vcard Foto" class="img-fluid rounded-circle" style="max-width: 200px;" for="photo_url">
+        <input type="file" accept="image/jpeg" @change="handleFileUpload" id="photo_url">
       </div>
     </div>
   </div>

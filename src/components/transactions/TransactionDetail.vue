@@ -69,8 +69,9 @@ const userStore = useUserStore()
   }
   if (userStore.userType === 'V') {
     if (editingTransaction.value.value <= 0 || 
-        editingTransaction.value.value > userStore.userBalance || 
-        editingTransaction.value.value > userStore.userMaxDebit) {
+        editingTransaction.value.value > vcardMax.value.balance 
+        || 
+        editingTransaction.value.value > vcardMax.value.max_debit) {
       toast.error('Invalid transaction value. Must be greater than 0 and within allowed limits.');
       return;
     }
@@ -88,6 +89,17 @@ const userStore = useUserStore()
     try {
       const response = await axios.get('vcards/'+ userStore.userId +'/categories/debit')
       categories.value = response.data.data
+      console.log(response.data.data);
+    } catch (error) {
+      toast.error('Error fetching categories!')
+    }
+  }
+  const vcardMax = ref([])
+  const fetchVcard_maxDebit = async () => {
+    try {
+      const response = await axios.get('vcards/'+ userStore.userId)
+      vcardMax.value = response.data.data
+
       console.log(response.data.data);
     } catch (error) {
       toast.error('Error fetching categories!')
@@ -133,6 +145,7 @@ const userStore = useUserStore()
     if (userStore.userType == 'V') {
      
     fetchCategories()
+    fetchVcard_maxDebit()
     
     }else{
       fetchVcardsNumbers()

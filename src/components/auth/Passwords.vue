@@ -47,10 +47,15 @@ const profile = async () => {
         toast.error('Password atual inválida');
         return;
     }else{
-      console.log(credentialsProfile)
-      if (await userStore.profile(credentialsProfile,'password')) {
+      console.log("aqui")
+      const formData = new FormData();
+      for (const key in credentialsProfile.value) {
+          formData.append(key, credentialsProfile.value[key]);
+      }
+      console.log("aqui2")
+      if (await userStore.profile(formData)) {
         toast.success('Passwords atualizada com sucesso!');
-
+        console.log("aqui3")
         //emit('profile');
         router.push({ name: 'Dashboard' });
       } else {
