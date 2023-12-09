@@ -34,7 +34,11 @@ const clickMenuOption = () => {
 <template>
   <nav class="navbar navbar-expand-md navbar-dark bg-dark sticky-top flex-md-nowrap p-0 shadow">
     <div class="container-fluid">
-      <router-link class="navbar-brand col-md-3 col-lg-2 me-0 px-3" :to="{ name: 'home' }" @click="clickMenuOption"> 
+      <router-link class="navbar-brand col-md-3 col-lg-2 me-0 px-3" :to="{ name: 'Dashboard' }" @click="clickMenuOption" v-show="userStore.userType=='V'"> 
+        <img src="@/assets/logo.svg" alt="" width="30" height="24" class="d-inline-block align-text-top">
+        Vcards Website
+      </router-link> 
+      <router-link class="navbar-brand col-md-3 col-lg-2 me-0 px-3" :to="{ name: 'DashboardAdmin' }" @click="clickMenuOption" v-show="userStore.userType=='A'"> 
         <img src="@/assets/logo.svg" alt="" width="30" height="24" class="d-inline-block align-text-top">
         Vcards Website
       </router-link> 

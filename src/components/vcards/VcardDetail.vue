@@ -1,12 +1,12 @@
 <script setup>
-import { ref, inject, onMounted } from 'vue'
-
+import { ref, computed, onMounted, inject} from 'vue'
+import avatarNoneUrl from '@/assets/avatar-none.png'
 const props = defineProps({
   vcard: Object
 })
 
 //const projects = inject('projects')
-
+const serverBaseUrl = inject('serverBaseUrl')
 const emit = defineEmits(['hide', 'requestUpdateVcard'])
 
 const editVcard = ref(Object.assign({}, props.vcard))
@@ -15,16 +15,33 @@ const inputDescription = ref(null)
 const showErrors = ref(false) // just for testing the errors presentation/layout
 
 const save = () => {
-  // Instead of updating the data (task) here, we request to update it by emiting an event
-  emit('requestUpdateVcard', editVcard.value)
+  let vcardToSave = {
+    ...editVcard.value,
+    blocked: editVcard.value.blocked ? 1 : 0
+  };
 
-  // after saving we also want to hide the component
-  emit('hide')
+  emit('requestUpdateVcard', vcardToSave);
+  emit('hide');
+
+}
+
+const getPhotoUrl = (photoUrl) => {
+  
+  return photoUrl
+    ? serverBaseUrl + '/storage/fotos/' + photoUrl
+    : avatarNoneUrl;
 }
 
 const cancel = () => {
   emit('hide')
 }
+
+const blockedForDisplay = computed({
+  get: () => editVcard.value.blocked === 1,
+  set: (newValue) => {
+    editVcard.value.blocked = newValue ? 1 : 0;
+  }
+});
 
 onMounted(() => {
   // Initializing with the focus on the input
@@ -36,17 +53,16 @@ onMounted(() => {
 
 <template>
   <form action="#" class="d-flex">
-    <img :src="editVcard.photo_url" alt="" class="img-fluid larger-image me-3">
+    <img :src="getPhotoUrl(vcard.photo_url)" alt="" class="img-fluid larger-image me-3">
     <div class="me-3 flex-grow-1">
       <div class="mb-3">
         <label>Blocked:</label>
         <input
-          class="form-check-input"
-          type="checkbox"
-          id="blocked"
-          v-model="editVcard.blocked"
-          :checked="editVcard.blocked"
-        />
+            class="form-check-input"
+            type="checkbox"
+            id="blocked"
+            v-model="blockedForDisplay"
+          />
         <label class="form-check-label" for="blocked">{{ editVcard.blocked ? 'Sim' : 'Não' }}</label>
       </div>
       <div>
