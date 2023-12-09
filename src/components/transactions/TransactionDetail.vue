@@ -118,8 +118,9 @@ const userStore = useUserStore()
     try {
       const response = await axios.get('vcards')
       //get only vcards numbers and not blocked 1 or 0
-      response.data.data = response.data.data.filter(vcard => vcard.blocked == 0).map(vcard => vcard.phone_number)
-      vcardsNumbers.value = response.data.data
+      
+      vcardsNumbers.value = response.data.data.filter(vcard => vcard.blocked == 0)
+
 
       console.log(vcardsNumbers.value);
     } catch (error) {
