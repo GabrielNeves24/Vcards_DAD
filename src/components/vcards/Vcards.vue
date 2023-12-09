@@ -5,6 +5,7 @@ import { useUserStore } from "../../stores/user.js"
 import { ref, computed, onMounted } from 'vue'
 import VcardList from "./VcardList.vue"
 import { useToast } from "vue-toastification"
+import * as XLSX from 'xlsx'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -19,6 +20,18 @@ VcardsTitle: {
     default: false
   }
 })
+
+const exportToExcel = () => {
+  // remove password and confirm_password from the export
+  vcards.value.forEach(function (v) {
+    delete v.password;
+    delete v.confirmation_code;
+  });
+  const ws = XLSX.utils.json_to_sheet(vcards.value);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Vcards");
+  XLSX.writeFile(wb, "Vcards.xlsx");
+};
 
 
 const loadVcards = async () => {
@@ -175,13 +188,10 @@ const updatePage = (direction) => {
         <input class="form-control"
           id="phone_number" type="number" v-model="filterByPhoneNumber">
       </div>
-      <!-- <div class="mx-2 mt-2">
-        <button
-          type="button"
-          class="btn btn-success px-4 btn-addtask"
-          @click="addTransaction"
-        ><i class="bi bi-xs bi-plus-circle"></i>&nbsp; Nova Transação</button>
-      </div> -->
+       <div class="mx-2 mt-2">
+        <button @click="exportToExcel" class="btn btn-primary px-4 btn-addtask"> Exportar para Excel</button>
+      </div>
+      
     </div>
     <VcardList
       :vcards="filteredVcards"

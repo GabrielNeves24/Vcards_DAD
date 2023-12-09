@@ -9,6 +9,8 @@ import { useUserStore } from '../stores/user.js'
 //import SpendingChart from '../components/transactions/SpendingChart.vue'
 import MonthlyTransactionsChart from './charts/MonthlyTransactionsChart.vue'
 import DailyTransactionsChart from './charts/DailyTransactionsChart.vue'
+import PaymentTypeChart from './charts/PaymentTypeChart.vue'
+import PaymentTypeChartCredit from './charts/PaymentTypeChartCredit.vue'
 
 
 const toast = useToast()
@@ -194,6 +196,16 @@ onMounted(() => {
       <div class="chart">
         <h3 class="section-title">Numero Transações Diárias (Ultimos 30 dias)</h3>
         <DailyTransactionsChart />
+      </div>
+    </div>
+    <div class="charts-container">
+      <div class="chart">
+        <h3 class="section-title">Numero Transações por Tipo Pagamento (Débito)</h3>
+        <PaymentTypeChart />
+      </div>
+      <div class="chart">
+        <h3 class="section-title">Numero Transações por Tipo Pagamento (Crédito)</h3>
+        <PaymentTypeChartCredit />
       </div>
     </div>
 

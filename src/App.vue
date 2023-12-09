@@ -172,14 +172,14 @@ const clickMenuOption = () => {
                     Team Members
                 </router-link>
             </li> -->
-            <li class="nav-item" v-show="userStore.userType == 'A'">
+            <!-- <li class="nav-item" v-show="userStore.userType == 'A'">
             <router-link class="nav-link" 
               :class="{ active: $route.name === 'Reports' }"
               :to="{ name: 'Reports' }" @click="clickMenuOption">
                 <i class="bi bi-bar-chart-line"></i>
                 Reports
-            </router-link>
-            </li>
+            </router-link> 
+            </li>-->
           </ul>
 
         

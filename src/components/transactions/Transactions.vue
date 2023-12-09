@@ -5,10 +5,18 @@ import { useUserStore } from "../../stores/user.js"
 import { useTransactionsStore } from "../../stores/transactions.js"
 import { ref, computed, onMounted } from 'vue'
 import TransactionTable from "./TransactionTable.vue"
+import * as XLSX from 'xlsx'
 
 const router = useRouter()
 const userStore = useUserStore()
 const transactionsStore = useTransactionsStore()
+
+const exportToExcel = () => {
+  const ws = XLSX.utils.json_to_sheet(transactions.value);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Transactions");
+  XLSX.writeFile(wb, "Transactions.xlsx");
+};
 
 const loadTransactions = async () => {
   if (userStore.userId == null) {
@@ -137,6 +145,11 @@ const updatePage = (direction) => {
   }
 };
 
+const totalTransactions = computed(() => {
+  //filteredTransactions is paginaterd get all transactions length
+  return transactions.value.length
+});
+
 
 onMounted (() => {
   loadTransactions()
@@ -244,7 +257,9 @@ onMounted (() => {
         class="btn btn-success px-4 btn-addtask"
         @click="addTransaction"
       ><i class="bi bi-xs bi-plus-circle"></i>&nbsp; Nova Transação</button>
+      <button @click="exportToExcel" class="btn btn-primary px-4 btn-addtask"> Exportar para Excel</button>
     </div>
+    
   </div>
   <transaction-table
     :transactions="filteredTransactions"

@@ -5,6 +5,7 @@ import { useUserStore } from "../../stores/user.js"
 import { ref, computed, onMounted } from 'vue'
 import UserList from "./UserList.vue"
 import { useToast } from "vue-toastification"
+import * as XLSX from 'xlsx'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -18,6 +19,18 @@ const loadUsers = async () => {
     console.log(error)
   }
 }
+
+const exportToExcel = () => {
+  //remove password and confirm_password from the export
+  users.value.forEach(function (v) {
+    delete v.password;
+    delete v.confirmation_code;
+  });
+  const ws = XLSX.utils.json_to_sheet(users.value);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Users");
+  XLSX.writeFile(wb, "Users.xlsx");
+};
 
 const showAddUserForm = ref(false);
 
@@ -149,6 +162,7 @@ onMounted (() => {
         class="btn btn-success px-4 btn-adduser"
         @click="toggleAddUserForm"
       ><i class="bi bi-xs bi-plus-circle"></i>&nbsp; Novo Administrador</button>
+      <button @click="exportToExcel" class="btn btn-success px-4 btn-adduser"> Exportar para Excel</button>
 
       <div v-if="showAddUserForm">
         <h3></h3>
