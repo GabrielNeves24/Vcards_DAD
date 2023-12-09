@@ -61,13 +61,15 @@ const editUser = (user) => {
 }
 
 const deletedUser = async (deletedUser) => {
-  if (!deletedUser.value) {
+  console.log(deletedUser.id)
+  if (!deletedUser.id) {
      console.error("Sem user para eliminar");
      return;
    }
     try {
-      const reponse = await axios.delete('users/' + deletedUser.value.id)
+      const reponse = await axios.delete('users/' + deletedUser.id)
       toast.success("Administrador eliminado com sucesso")
+      loadUsers()
       router.push({ name: 'Users' })
     } catch (error) {
       console.log(error)

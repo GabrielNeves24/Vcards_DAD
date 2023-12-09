@@ -33,24 +33,43 @@ const loadTransactions = async () => {
     try {
     const response = await axios.get('vcards/' + userStore.userId + '/transactions/all')
     transactions.value = response.data.data
+    const response2 = await axios.get('vcards/' + userStore.userId + '/categories')
+      categories.value = response2.data.data
+      //when i get the transactions i want to add the category name to show in the table and with value of the category id
+      transactions.value.forEach(function (v) {
+        categories.value.forEach(function (c) {
+          if (v.category_id == c.id) {
+            v.category = c.name
+          }
+        });
+      });
   } catch (error) {
     console.log(error)
   }
   }
 }
-const loadCategories = async () => {
-  if (userStore.userId == null) {
-    return
-  }
-  if (userStore.userType == 'V') {
-      try {
-      const response = await axios.get('vcards/' + userStore.userId + '/categories')
-      categories.value = response.data.data
-    } catch (error) {
-      console.log(error)
-    }
-  }
-}
+// const loadCategories = async () => {
+//   if (userStore.userId == null) {
+//     return
+//   }
+//   if (userStore.userType == 'V') {
+//       try {
+//       const response = await axios.get('vcards/' + userStore.userId + '/categories')
+//       categories.value = response.data.data
+//       //when i get the transactions i want to add the category name to show in the table and with value of the category id
+//       transactions.value.forEach(function (v) {
+//         categories.value.forEach(function (c) {
+//           if (v.category_id == c.id) {
+//             v.category = c.name
+//           }
+//         });
+//       });
+//       console.log(transactions.value)
+//     } catch (error) {
+//       console.log(error)
+//     }
+//   }
+// }
 
 const addTransaction = () => {
     router.push({ name: 'NewTransaction' })
@@ -153,7 +172,7 @@ const totalTransactions = computed(() => {
 
 onMounted (() => {
   loadTransactions()
-  loadCategories()
+  //loadCategories()
 })
 </script>
 

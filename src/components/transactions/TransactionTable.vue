@@ -60,15 +60,17 @@ const editClick = (transaction) => {
   <table class="table">
     <thead>
       <tr>
-        <th v-if="showId">#</th>
-        <th>Date</th>
-        <th>Payment Reference</th>
-        <th>Category</th>
-        <th>Description</th>
-        <th>Type</th>
-        <th>Value</th>
-        <th>Old Balance</th>
+        <th v-if="showId">N.#</th>
+        <th>Data</th>
         <th>Tipo Pagamento</th>
+        <th>Referencia</th>
+        <th v-show="userStore.userType == 'A'">Tipo</th>
+        <th>Valor</th>
+        <th>Categoria</th>
+        <th>Descrição</th>
+
+        <th v-show="userStore.userType == 'A'">Old Balance</th>
+        
         <th v-if="showEditButton"></th>
       </tr>
     </thead>
@@ -76,13 +78,15 @@ const editClick = (transaction) => {
       <tr v-for="transaction in editingTransactions" :key="transaction.id">
         <td v-if="showId">{{ transaction.id }}</td>
         <td>{{ transaction.date }}</td>
-        <td>{{ transaction.payment_reference }}</td>
-        <td>{{ transaction.category }}</td>
-        <td>{{ transaction.description }}</td>
-        <td>{{ transaction.type }}</td>
-        <td>{{ transaction.value }}</td>
-        <td>{{ transaction.old_balance }}</td>
         <td>{{ transaction.payment_type }}</td>
+        <td>{{ transaction.payment_reference }}</td>
+        <td v-show="userStore.userType == 'A'">{{ transaction.type }}</td>
+        <td :class="{'text-green': transaction.type === 'D', 'text-red': transaction.type !== 'D'}">{{ transaction.type === 'D' ? transaction.value : -transaction.value }}</td>
+        <td>{{ !transaction.category ? 'N/A' : transaction.category }}</td>
+        <td>{{ transaction.description }}</td>
+        
+        <td v-show="userStore.userType == 'A'">{{ transaction.old_balance }}</td>
+        
         <td 
           class="text-end"
           v-if="showEditButton">
@@ -101,12 +105,111 @@ const editClick = (transaction) => {
 </template>
 
 <style scoped>
+.table {
+  width: 100%;
+  background-color: #fff;
+  border-collapse: collapse;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+  margin-top: 20px;
+}
+
+.table th,
+.table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #eaecef;
+  text-align: left;
+}
+
+.table th {
+  background-color: #f9fafb;
+  color: #333;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.table tbody tr:hover {
+  background-color: #f4f7fa;
+}
+
+/* Responsive table */
+@media screen and (max-width: 768px) {
+  .table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+}
+
+/* Style for edit button */
+.btn {
+  background-color: #3498db; /* Adjust the color to match dashboard theme */
+  color: #fff;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+  background-color: #2980b9;
+}
+
+.btn-light {
+  background-color: #ecf0f1;
+  color: #333;
+}
+
+.bi-pencil {
+  /* If you're using Bootstrap Icons */
+  display: inline-block;
+  font-size: 0.8rem;
+  vertical-align: middle;
+}
+
+/* Style for completed tasks */
 .completed {
+  color: #95a5a6;
   text-decoration: line-through;
 }
 
+/* Additional styles for buttons */
 button {
-  margin-left: 3px;
-  margin-right: 3px;
+  margin: 0 5px;
 }
+
+/* Hover styles for interactivity */
+button:hover {
+  opacity: 0.8;
+}
+
+.d-flex {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.justify-content-end {
+  justify-content: flex-end;
+}
+
+.text-end {
+  text-align: right;
+}
+
+.text-red {
+  color: red;
+}
+
+.text-green {
+  color: green;
+}
+
+
 </style>

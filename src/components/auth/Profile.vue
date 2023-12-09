@@ -3,7 +3,7 @@ import axios from 'axios'
 import { useToast } from "vue-toastification"
 import { useRouter } from 'vue-router'
 import { useUserStore } from '../../stores/user.js'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 
 const toast = useToast()
 const router = useRouter()
@@ -23,7 +23,10 @@ const credentialsProfile = ref({
 };
 
 const handleFileUpload = (event) => {
-  credentialsProfile.value.photo_url = event.target.files[0];
+  const files = event.target.files;
+  if (files && files[0]) {
+    credentialsProfile.value.photo_url = files[0];
+  }
 };
 const emit = defineEmits(['profile'])
 
@@ -51,6 +54,20 @@ const profile = async () => {
       }
     }
 }
+
+const photoPreview = computed(() => {
+  if (credentialsProfile.value.photo_url && typeof credentialsProfile.value.photo_url === 'object') {
+    return URL.createObjectURL(credentialsProfile.value.photo_url);
+  }
+  return userStore.userPhotoUrl;
+});
+
+watch(() => credentialsProfile.value.photo_url, (newVal, oldVal) => {
+  if (oldVal && typeof oldVal === 'object') {
+    URL.revokeObjectURL(oldVal);
+  }
+});
+
 
 
 const fetchData = async () => {
@@ -114,16 +131,29 @@ onMounted(() => {
               v-model="credentialsProfile.email"
             >
           </div>
-          <div class="mb-3 d-flex justify-content-center">
-            <button type="button" class="btn btn-primary px-5" @click="profile">Save</button>
-          </div>
+          
         </form>
       </div>
-      <div v-if="userStore.userType == 'V'" class="col-md-6 d-flex align-items-center justify-content-center" >
-        <img :src="userStore.userPhotoUrl" alt="Vcard Foto" class="img-fluid rounded-circle" style="max-width: 200px;" for="photo_url">
-        <input type="file" accept="image/jpeg" @change="handleFileUpload" id="photo_url">
+      <div v-if="userStore.userType == 'V'" class="col-md-6 d-flex align-items-center justify-content-center">
+        <img :src="photoPreview" alt="User Photo" class="user-photo">
+        <input type="file" accept="image/*" @change="handleFileUpload" id="photo_url">
       </div>
     </div>
   </div>
+  <div class="mb-3 d-flex justify-content-center">
+            <button type="button" class="btn btn-primary px-5" @click="profile">Save</button>
+          </div>
 </template>
+
+<style scoped>
+  .user-photo {
+  max-width: 200px;
+  max-height: 200px;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  border-radius: 10px; /* Rounded corners */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: add shadow for depth */
+}
+</style>
 

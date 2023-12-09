@@ -66,15 +66,25 @@ const userStore = useUserStore()
 
   const save = async () => {
     if (!validatePaymentReference() && editingTransaction.value.id == null) {
-      toast.error('Invalid Payment Reference!');
+      toast.error('Referencia inválida');
       return;
   }
   if (userStore.userType === 'V' && editingTransaction.value.id == null) {
-    if (editingTransaction.value.value <= 0 || 
-        editingTransaction.value.value > vcardMax.value.balance 
-        || 
-        editingTransaction.value.value > vcardMax.value.max_debit || pin.value.value == null) {
-      toast.error('Invalid transaction value. Must be greater than 0 and within allowed limits.');
+    if (editingTransaction.value.value <= 0 )
+    {
+      toast.error('Insira um valor positivo');
+      return;
+    }
+    if (editingTransaction.value.value > vcardMax.value.balance) {
+      toast.error('Sem saldo suficiente para efetuar a transação');
+      return;
+    }
+    if (editingTransaction.value.value > vcardMax.value.max_debit ) {
+      toast.error('Valor da transação superior ao permitido');
+      return;
+    }
+    if (pin.value.value == null){
+      toast.error('Pin inválido');
       return;
     }
     const isPasswordValid = await userStore.verifyPin(pin.value.value);
@@ -96,6 +106,8 @@ const userStore = useUserStore()
     try {
       const response = await axios.get('vcards/'+ userStore.userId +'/categories/debit')
       categories.value = response.data.data
+      //add 1 category empty, and send with no value
+      categories.value.push({id: null, name: null})
       console.log(response.data.data);
     } catch (error) {
       toast.error('Error fetching categories!')

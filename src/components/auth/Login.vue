@@ -18,7 +18,7 @@ const emit = defineEmits(['login'])
 
 const login = async () => {
   if (await userStore.login(credentials.value)) {
-    toast.success('User ' + userStore.user.name + ' has entered the application.')
+    toast.success('Utilizador  ' + userStore.user.name + ' autenticado com sucesso')
     emit('login')
     if (userStore.userType == 'A'){
       router.push({ name: 'DashboardAdmin' })
@@ -28,7 +28,7 @@ const login = async () => {
     
   } else {
     credentials.value.password = ''
-    toast.error('User credentials are invalid!')
+    toast.error('Credenciais inválidas!')
   }
 }
 

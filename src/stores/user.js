@@ -3,6 +3,7 @@ import { ref, computed, inject } from 'vue'
 import { defineStore } from 'pinia'
 import avatarNoneUrl from '@/assets/avatar-none.png'
 import { useTransactionsStore } from "./transactions.js"
+import { useToast } from "vue-toastification"
 
 
 export const useUserStore = defineStore('user', () => {
@@ -10,6 +11,7 @@ export const useUserStore = defineStore('user', () => {
     const serverBaseUrl = inject('serverBaseUrl')
     const transactionsStore = useTransactionsStore()
 
+    const toast = useToast()
     const user = ref(null)
 
     const userName = computed(() => user.value?.name ?? 'Anonymous')
@@ -34,6 +36,7 @@ export const useUserStore = defineStore('user', () => {
             user.value = response.data.data
         } catch (error) {
             clearUser()
+            
             throw error
         }
     }
@@ -53,11 +56,15 @@ export const useUserStore = defineStore('user', () => {
             axios.defaults.headers.common.Authorization = "Bearer " + response.data.access_token
             sessionStorage.setItem('token', response.data.access_token)
             await loadUser()
-            //await projectsStore.loadProjects()
             return true       
         } 
         catch(error) {
-            clearUser()            
+            //get the error message coming {"error":"VCard eliminado"}
+            console.log(error.response.data.error)
+            const message = error.response.data.error
+            toast.error(message)
+            
+            clearUser() 
             return false
         }
     } 

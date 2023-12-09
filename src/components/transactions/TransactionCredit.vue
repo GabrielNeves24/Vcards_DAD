@@ -94,7 +94,7 @@ const operation = computed( () => (!props.id || props.id < 0) ? 'insert' : 'upda
 watch(
   () => props.id,
   (newValue) => {
-    loadTransactions(newValue)
+      loadTransactions(newValue)
     }, 
   { immediate: true}
 )
