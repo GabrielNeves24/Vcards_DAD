@@ -29,11 +29,10 @@
   const fetchTransactionsData = async () => {
     console.log('Fetching transactions data...');
     try {
-      const response = await axios.get('transactions/info/transacionsByMonth');
+      const response = await axios.get('transactions/info/transacionsByDay');
       console.log('API Response:', response.data);
       // Assuming the data is nested under the 'date' key
-      //only last 30 days
-      transactionsData.value = response.data.date.slice(-30).map(item => ({
+      transactionsData.value = response.data.date.map(item => ({
         ...item,
         pl: parseFloat(item.pl),
         avg: parseFloat(item.avg)

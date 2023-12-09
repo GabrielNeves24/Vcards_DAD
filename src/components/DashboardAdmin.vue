@@ -1,13 +1,14 @@
 <script setup>
 
-import { ref, onMounted } from 'vue'
+import { ref, onMounted,computed } from 'vue'
 import axios from 'axios'
 import { useToast } from "vue-toastification"
 import { useRouter } from 'vue-router'
 import { useUserStore } from '../stores/user.js'
-import RecentTransactions from '../components/transactions/RecentTransactions.vue';
-import SpendingChart from '../components/transactions/SpendingChart.vue'
+//import RecentTransactions from '../components/transactions/RecentTransactions.vue';
+//import SpendingChart from '../components/transactions/SpendingChart.vue'
 import MonthlyTransactionsChart from './charts/MonthlyTransactionsChart.vue'
+import DailyTransactionsChart from './charts/DailyTransactionsChart.vue'
 
 
 const toast = useToast()
@@ -16,12 +17,116 @@ const userStore = useUserStore()
 
 
 const vcards = ref(null)
+const transactions = ref(null)
 const errors = ref(null)
 
 
+const numberOfVcards = computed(() => {
+  if (!vcards.value) {
+    return 0
+  }
+  return vcards.value.length
+})
+
+const numberOfVcardsAtive = computed(() => {
+  if (!Array.isArray(vcards.value)) {
+    return 0;
+  }
+  return vcards.value.filter(vcard => vcard.blocked == 0).length;
+});
+
+const numberOfVcardsBlocked = computed(() => {
+  if (!Array.isArray(vcards.value)) {
+    return 0;
+  }
+  return vcards.value.filter(vcard => vcard.blocked == 1).length;
+});
+
+const numberOfTransactions = computed(() => {
+  if (!transactions.value) {
+    return 0
+  }
+  return transactions.value.length
+})
+
+const totalBalance = computed(() => {
+  if (!Array.isArray(vcards.value) || vcards.value.length === 0) {
+    return 0;
+  }
+  return vcards.value.reduce((acc, vcard) => {
+    // Convert balance to a float before adding it to the accumulator
+    const balance = parseFloat(vcard.balance) || 0;
+    return acc + balance;
+  }, 0).toFixed(2); // You can adjust the number of decimal places if needed
+});
+
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+
+const sumOfDebitTransactionsToday = computed(() => {
+  if (!Array.isArray(transactions.value) || transactions.value.length === 0) {
+    return 0;
+  }
+  return transactions.value.reduce((acc, transaction) => {
+    const transactionDate = new Date(transaction.date); // Assuming 'date' is the date property
+    transactionDate.setHours(0, 0, 0, 0);
+
+    if (transactionDate.getTime() === today.getTime() && transaction.type === 'D') {
+      // Assuming 'amount' is the property name that holds the transaction amount
+      return acc + parseFloat(transaction.value);
+    }
+    return acc;
+  }, 0).toFixed(2); // Formatting the result to two decimal places
+});
+
+const sumOfCreditTransactionsToday = computed(() => {
+  if (!Array.isArray(transactions.value) || transactions.value.length === 0) {
+    return 0;
+  }
+  return transactions.value.reduce((acc, transaction) => {
+    const transactionDate = new Date(transaction.date); // Assuming 'date' is the date property
+    transactionDate.setHours(0, 0, 0, 0);
+
+    if (transactionDate.getTime() === today.getTime() && transaction.type === 'C') {
+      // Assuming 'amount' is the property name that holds the transaction amount
+      return acc + parseFloat(transaction.value);
+    }
+    return acc;
+  }, 0).toFixed(2); // Formatting the result to two decimal places
+});
+
+const sumOfTransactionsToday = computed(() => {
+  if (!Array.isArray(transactions.value) || transactions.value.length === 0) {
+    return 0;
+  }
+  return transactions.value.reduce((acc, transaction) => {
+    const transactionDate = new Date(transaction.date); // Assuming 'date' is the date property
+    transactionDate.setHours(0, 0, 0, 0);
+
+    if (transactionDate.getTime() === today.getTime()) {
+      // Assuming 'amount' is the property name that holds the transaction amount
+      return acc + parseFloat(transaction.value);
+    }
+    return acc;
+  }, 0).toFixed(2); // Formatting the result to two decimal places
+});
+
+
+
+const loadTransactions = async () => {
+  try {
+    const response = await axios.get('transactions')
+    transactions.value = response.data.data
+    //console.log(numberOfTransactions.value)
+  } catch (error) {
+    errors.value = "Failed to load data"; // Set error message
+    console.log(error)
+  }
+}
+
 const loadVcard = async () => {
   try {
-    const response = await axios.get('users/' + userStore.userId)
+    const response = await axios.get('vcards')
     vcards.value = response.data.data
     console.log(vcards.value)
   } catch (error) {
@@ -30,111 +135,133 @@ const loadVcard = async () => {
   }
 }
 
+
 onMounted(() => {
   loadVcard()
+  loadTransactions()
   console.log(vcards.value)
 })
 
 </script>
 
 <template>
-    <section class="dashboard-content">
-      <div class="vcard-section">
-        <h2 class="section-title">Saldo {{ vcards?.balance }} €</h2>
-        <div class="vcard-list">
-          <div class="vcard">
-            <!-- Add more card details here -->
-            
-          </div>
-        </div>
+  <section class="dashboard-content">
+    <!-- Computed Vcard Info -->
+    <div class="vcard-stats">
+      <div class="info-box">
+        <span class="info-title">Total Vcards</span>
+        <span class="info-number">{{ numberOfVcards }}</span>
       </div>
-      <!-- Additional sections can be added here -->
-      <div class="vcard-section">
-        <h2 class="section-title">Transações</h2>
-        <div class="vcard-list">
-          <div class="vcard">
-            <MonthlyTransactionsChart 
-             />
-            <!-- Add more card details here -->
-          </div>
-        </div>
+      <div class="info-box">
+        <span class="info-title">Active Vcards</span>
+        <span class="info-number">{{ numberOfVcardsAtive }}</span>
       </div>
-      <div class="vcard-section">
-        <h2 class="section-title">Transações recentes</h2>
-        <div class="vcard-list">
-          <div class="vcard">
-            <!-- <RecentTransactions /> -->
-            <!-- Add more card details here -->
-          </div>
-        </div>
+      <div class="info-box">
+        <span class="info-title">Blocked Vcards</span>
+        <span class="info-number">{{ numberOfVcardsBlocked }}</span>
       </div>
-      <div v-if="errors">{{ errors }}</div>
-    </section>
+      <div class="info-box">
+        <span class="info-title">Total Transactions</span>
+        <span class="info-number">{{ numberOfTransactions }}</span>
+      </div>
+    </div>
+    <div class="vcard-stats">
+      <div class="info-box">
+        <span class="info-title">Saldo Total Vcards Hoje</span>
+        <span class="info-number">{{ totalBalance }}</span>
+      </div>
+      <div class="info-box">
+        <span class="info-title">Debitos Hoje</span>
+        <span class="info-number">{{ sumOfDebitTransactionsToday }}</span>
+      </div>
+      <div class="info-box">
+        <span class="info-title">Creditos Hoje</span>
+        <span class="info-number">{{ sumOfCreditTransactionsToday }}</span>
+      </div>
+      <div class="info-box">
+        <span class="info-title">Total Transactions Hoje</span>
+        <span class="info-number">{{ sumOfTransactionsToday }}</span>
+      </div>
+    </div>
+
+
+    <!-- Charts Side by Side -->
+    <div class="charts-container">
+      <div class="chart">
+        <h3 class="section-title">Numero Transações Mensais</h3>
+        <MonthlyTransactionsChart />
+      </div>
+      <div class="chart">
+        <h3 class="section-title">Numero Transações Diárias (Ultimos 30 dias)</h3>
+        <DailyTransactionsChart />
+      </div>
+    </div>
+
+    <!-- Remaining sections... -->
+  </section>
 </template>
 
+
 <style scoped>
-
-.dashboard-header {
-  padding: 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.dashboard-title {
-  color: #333;
-  font-size: 24px;
-}
-
-.user-info {
-  display: flex;
-  align-items: center;
-}
-
-.user-photo {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  margin-right: 10px;
-}
-
-.user-name {
-  font-size: 18px;
-  font-weight: bold;
-}
-
-.vcard-section {
-  background-color: white;
-  padding: 15px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
 .section-title {
   color: #555;
   margin-bottom: 15px;
   text-align: center;
 }
 
-.vcard {
-  border-bottom: 1px solid #eee;
-  padding: 10px 0;
+.vcard-stats {
+  display: flex;
+  justify-content: space-around;
+  padding: 10px;
+  background-color: #f9f9f9;
+  margin-bottom: 20px;
 }
 
-.vcard:last-child {
-  border-bottom: none;
+.charts-container {
+  display: flex;
+  justify-content: space-around;
 }
 
-.vcard-name {
-  font-size: 16px;
+.chart {
+  flex: 1;
+  margin-right: 10px;
+  text-align: center;
+}
+
+.chart:last-child {
+  margin-right: 0;
+}
+
+.vcard-stats {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 20px;
+}
+
+.info-box {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  min-width: 150px;
+}
+
+.info-title {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 5px;
+  display: block;
+}
+
+.info-number {
+  font-size: 18px;
+  font-weight: bold;
   color: #333;
 }
 
-.vcard-balance {
-  font-size: 14px;
-  color: #666;
-}
+
 </style>
 
   
