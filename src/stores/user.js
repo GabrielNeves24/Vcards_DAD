@@ -142,6 +142,20 @@ export const useUserStore = defineStore('user', () => {
             return false;
         }
     }
+
+    async function verifyPin(pin) {
+        try {
+            const response = await axios.post('/verify-pin', {
+                enteredPassword: pin,
+                user: userId.value,
+                userType: userType.value
+            });
+            return response.data.isValid;
+        } catch (error) {
+            return false;
+        }
+    }
+    
     
 
     async function logout () {
@@ -190,5 +204,6 @@ export const useUserStore = defineStore('user', () => {
         userType,
         profile,
         verifyPassword,
+        verifyPin,
     }
 })

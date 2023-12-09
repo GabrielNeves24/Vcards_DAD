@@ -31,7 +31,9 @@ const userStore = useUserStore()
   })
 
   const emit = defineEmits(['save', 'cancel'])
-
+  const pin = ref({
+    value: null,
+  })
   const editingTransaction = ref(props.transaction)
 
   watch(
@@ -62,18 +64,23 @@ const userStore = useUserStore()
       }
   })
 
-  const save = () => {
-    if (!validatePaymentReference()) {
+  const save = async () => {
+    if (!validatePaymentReference() && editingTransaction.value.id == null) {
       toast.error('Invalid Payment Reference!');
       return;
   }
-  if (userStore.userType === 'V') {
+  if (userStore.userType === 'V' && editingTransaction.value.id == null) {
     if (editingTransaction.value.value <= 0 || 
         editingTransaction.value.value > vcardMax.value.balance 
         || 
-        editingTransaction.value.value > vcardMax.value.max_debit) {
+        editingTransaction.value.value > vcardMax.value.max_debit || pin.value.value == null) {
       toast.error('Invalid transaction value. Must be greater than 0 and within allowed limits.');
       return;
+    }
+    const isPasswordValid = await userStore.verifyPin(pin.value.value);
+    if (!isPasswordValid) {
+        toast.error('Pin inválido');
+        return;
     }
   }
 
@@ -110,8 +117,10 @@ const userStore = useUserStore()
   const fetchVcardsNumbers = async () => {
     try {
       const response = await axios.get('vcards')
-      //get only vcards numbers
-      vcardsNumbers.value = response.data.data;
+      //get only vcards numbers and not blocked 1 or 0
+      response.data.data = response.data.data.filter(vcard => vcard.blocked == 0).map(vcard => vcard.phone_number)
+      vcardsNumbers.value = response.data.data
+
       console.log(vcardsNumbers.value);
     } catch (error) {
       toast.error('Error fetching categories!')
@@ -263,6 +272,10 @@ const userStore = useUserStore()
       ></textarea>
       <field-error-message :errors="errors" fieldName="description"></field-error-message>
     </div>
+    <div class="mb-3" v-show="userStore.userType=='V'  && operationType === 'insert'">
+              <label for="currentPassword" class="form-label">Pin (Confirmação)</label>
+              <input type="password" class="form-control" id="currentPassword" v-model="pin.value">
+            </div>
     <div v-show="operationType == 'insert'">
       <div class="mb-3 d-flex justify-content-end">
         <button

@@ -49,8 +49,11 @@ const profile = async () => {
     }else{
       console.log("aqui")
       const formData = new FormData();
-      for (const key in credentialsProfile.value) {
+      //apend only data that is not null
+      for(const key in credentialsProfile.value){
+        if(credentialsProfile.value[key] != null){
           formData.append(key, credentialsProfile.value[key]);
+        }
       }
       console.log("aqui2")
       if (await userStore.profile(formData)) {

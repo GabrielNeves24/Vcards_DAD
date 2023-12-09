@@ -31,7 +31,7 @@ const confirmationLeaveDialog = ref(null)
 // String with the JSON representation after loading the project (new or edit)
 let originalValueStr = ''
   
-const loadTask = async (id) => {
+const loadTransactions = async (id) => {
   originalValueStr = ''
   errors.value = null
   if (!id || (id < 0)) {
@@ -94,7 +94,7 @@ const operation = computed( () => (!props.id || props.id < 0) ? 'insert' : 'upda
 watch(
   () => props.id,
   (newValue) => {
-      loadTask(newValue)
+    loadTransactions(newValue)
     }, 
   { immediate: true}
 )

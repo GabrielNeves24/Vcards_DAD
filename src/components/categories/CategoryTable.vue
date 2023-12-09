@@ -116,7 +116,7 @@ const deleteCategoryConfirmed = async () => {
   <table class="table">
     <thead>
       <tr>
-        <th v-if="showId">#</th>
+        <!-- <th v-if="showId">#</th> -->
         <th>Tipo</th>
         <th>Nome</th>
         <th v-if="showDeleteButton || showEditButton || showDeleteButton"></th>
@@ -124,7 +124,7 @@ const deleteCategoryConfirmed = async () => {
     </thead>
     <tbody>
       <tr v-for="category in editingCategories" :key="category.id">
-        <td v-if="showId">{{ category.id }}</td>
+        <!-- <td v-if="showId">{{ category.id }}</td> -->
         <td>{{ category.type }}</td>
         <td>{{ category.name }}</td>
         <td
