@@ -69,6 +69,7 @@ onMounted(() => {
         <label>Nº Telefone: {{ editVcard.phone_number }}</label><br>
         <label>Nome: {{ editVcard.name }}</label><br>
         <label>Email: {{ editVcard.email }}</label><br>
+        <label>Saldo:  {{ editVcard.balance }} €</label><br>
         <label>Máximo. Débito: {{ editVcard.max_debit }}</label>
       </div>
       <div class="error" v-show="showErrors">Show error if necessary</div>
