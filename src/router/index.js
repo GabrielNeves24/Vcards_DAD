@@ -16,6 +16,7 @@ import Profile from "../components/auth/Profile.vue"
 import NewTransactionCredit from "../components/transactions/TransactionCredit.vue"
 import DashboardAdmin from "../components/DashboardAdmin.vue"
 import User from "../components/users/User.vue"
+import DeleteAcount from "../components/auth/DeleteAcount.vue"
 
 let handlingFirstRoute = true
 
@@ -48,6 +49,11 @@ const router = createRouter({
       component: ChangePassword
     },
     {
+      path: '/deleteAcount',
+      name: 'DeleteAcount',
+      component: DeleteAcount
+    },
+    {
       path: '/profile',
       name: 'Profile',
       component: Profile
@@ -63,17 +69,6 @@ const router = createRouter({
       component: DashboardAdmin
     },
     
-    // {
-    //   path: '/transactions/all',
-    //   name: 'TransactionsAll',
-    //   component: TransactionsAll,
-    // },
-    {
-      path: '/tasks/current',
-      name: 'CurrentTasks',
-      //component: Tasks,
-      //props: { onlyCurrentTasks: true, tasksTitle: 'Current Tasks' }
-    },
     
     {
       path: '/vcards',
@@ -150,12 +145,6 @@ const router = createRouter({
       name: 'Transactions',
       component: Transactions,
     },
-    // {
-    //   path: '/transactions/debit/new',
-    //   name: 'NewTransactionDebit',
-    //   component: NewTransactionDebit,
-    //   props: { id: -1 }
-    // },
     {
       path: '/transactions/credit/new',
       name: 'NewTransactionCredit',
@@ -175,23 +164,7 @@ const router = createRouter({
 
 
 
-    {
-      path: '/tasks/:id',
-      name: 'Task',
-      //component: Task,
-      //props: route => ({ id: parseInt(route.params.id) })
-    },
-    {
-      path: '/projects',
-      name: 'Projects',
-      //component: Projects,
-    },
-    {
-      path: '/projects/:id',
-      name: 'Project',
-      //component: Project,
-      //props: route => ({ id: parseInt(route.params.id) })
-    },
+
 
 
 
@@ -210,28 +183,6 @@ const router = createRouter({
       name: 'NewUser',
       component: User,
     },
-
-
-
-
-
-    {
-      path: '/projects/:id/tasks',
-      name: 'ProjectTasks',
-      //component: ProjectTasks,
-      //props: route => ({ id: parseInt(route.params.id) })
-    },
-    {
-      path: '/projects/:id/tasks/new',
-      name: 'NewTaskOfProject',
-      //component: Task,
-      //props: route => ({ id:-1, fixedProject:  parseInt(route.params.id) })
-    },
-    {
-      path: '/reports',
-      name: 'Reports',
-      //component: () => import('../views/AboutView.vue')
-    },
   ]
 })
 
@@ -248,12 +199,6 @@ router.beforeEach(async (to, from, next) => {
   if (!userStore.user) {
     next({ name: 'Login' })
     return
-  }
-  if (to.name == 'Reports') {
-    if (userStore.user.type != 'A') {
-      next({ name: 'home' })
-      return
-    }
   }
   if (to.name == 'User') {
     if ((userStore.user.type == 'A') || (userStore.user.id == to.params.id)) {

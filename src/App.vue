@@ -86,6 +86,14 @@ const clickMenuOption = () => {
                   Passwords
                 </router-link>
               </li>
+              <li>
+                <router-link class="dropdown-item"
+                            :class="{ active: $route.name == 'DeleteAcount' && $route.params.id == userStore.userId }"
+                            :to="{ name: 'DeleteAcount', params: { id: userStore.userId } }" @click="clickMenuOption">
+                  <i class="bi bi-bin-fill"></i>
+                  Eliminar Conta
+                </router-link>
+              </li>
               <li v-show="userStore.userType == 'A'">
                 <router-link class="dropdown-item" :class="{ active: $route.name === 'CategoriesDefaults' }" 
                               :to="{ name: 'CategoriesDefaults' }" @click="clickMenuOption">
@@ -226,6 +234,14 @@ const clickMenuOption = () => {
                       Passwords
                     </router-link>
                   </li>
+                  <li>
+                <router-link class="dropdown-item"
+                            :class="{ active: $route.name == 'DeleteAcount' && $route.params.id == userStore.userId }"
+                            :to="{ name: 'DeleteAcount', params: { id: userStore.userId } }" @click="clickMenuOption">
+                  <i class="bi bi-bin-fill"></i>
+                  Eliminar Conta
+                </router-link>
+              </li>
                   <li v-show="userStore.userType == 'A'">
                     <router-link class="dropdown-item" :class="{ active: $route.name === 'CategoriesDefaults' }" 
                                   :to="{ name: 'CategoriesDefaults' }" @click="clickMenuOption">

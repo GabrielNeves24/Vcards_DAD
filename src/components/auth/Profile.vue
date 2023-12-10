@@ -30,6 +30,8 @@ const handleFileUpload = (event) => {
 };
 const emit = defineEmits(['profile'])
 
+
+
 const profile = async () => {
   // Check if no changes were made
   if (initialData.name == credentialsProfile.value.name && 
@@ -141,8 +143,10 @@ onMounted(() => {
     </div>
   </div>
   <div class="mb-3 d-flex justify-content-center">
-            <button type="button" class="btn btn-primary px-5" @click="profile">Save</button>
-          </div>
+    <button type="button" class="btn btn-primary px-5" @click="profile">Guardar</button>
+    
+  </div>
+
 </template>
 
 <style scoped>

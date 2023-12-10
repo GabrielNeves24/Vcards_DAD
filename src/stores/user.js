@@ -68,6 +68,24 @@ export const useUserStore = defineStore('user', () => {
             return false
         }
     } 
+    
+    async function deleteAcountVCard() {
+        try {
+            const response = await axios.delete('vcards/' + userId.value)
+            clearUser()
+            return true
+        }
+        catch(error) {
+            console.log(error.response.data.message)
+            const mensaje = error.response.data.message
+            toast.error(mensaje)
+            return false
+        }
+    }
+
+
+
+
 
     async function loginRefresh(credentials) {
         //await logout()
@@ -212,5 +230,6 @@ export const useUserStore = defineStore('user', () => {
         profile,
         verifyPassword,
         verifyPin,
+        deleteAcountVCard,
     }
 })

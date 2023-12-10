@@ -36,10 +36,7 @@ const profile = async () => {
     toast.error('Passwords diferentes');
     return;
   } 
-  // const formData = new FormData();
-  // for (const key in credentialsProfile.value) {
-  //     formData.append(key, credentialsProfile.value[key]);
-  // }
+
   console.log(credentialsProfile)
   if ((credentialsProfile.value.password || credentialsProfile.value.confirmation_code) && credentialsProfile.value.currentPassword) {
     const isPasswordValid = await userStore.verifyPassword(credentialsProfile.value.currentPassword);
@@ -49,7 +46,7 @@ const profile = async () => {
     }else{
       console.log("aqui")
       const formData = new FormData();
-      //apend only data that is not null
+      
       for(const key in credentialsProfile.value){
         if(credentialsProfile.value[key] != null){
           formData.append(key, credentialsProfile.value[key]);
@@ -58,8 +55,7 @@ const profile = async () => {
       console.log("aqui2")
       if (await userStore.profile(formData)) {
         toast.success('Passwords atualizada com sucesso!');
-        console.log("aqui3")
-        //emit('profile');
+               
         router.push({ name: 'Dashboard' });
       } else {
         toast.error('Erro ao atualizar passwords!');
@@ -106,7 +102,7 @@ onMounted(() => {
           <div class="mb-3" v-show="userStore.userType == 'V'">
             <label for="confirmation_code" class="form-label">Novo Código de Confirmação (4 Digitos)</label>
             <input
-              type="number"
+              type="password"
               class="form-control"
               id="confirmation_code"
               v-model="credentialsProfile.confirmation_code"
@@ -118,10 +114,14 @@ onMounted(() => {
             </div>
           <div class="mb-3 d-flex justify-content-center">
             <button type="button" class="btn btn-primary px-5" @click="profile">Save</button>
-          </div>
+          </div>         
         </form>
       </div>
     </div>
   </div>
 </template>
+
+<style scoped>
+
+</style>
 
