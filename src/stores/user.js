@@ -50,11 +50,6 @@ export const useUserStore = defineStore('user', () => {
         user.value = null
     }     
 
-    socket.on('userLoggedIn', (data) => {
-        // Display toast notification
-        toast.info(`Admin #${data.userId} has logged in`);
-    });
-
     async function login(credentials) {
         try {
             const response = await axios.post('login', credentials)
@@ -76,6 +71,9 @@ export const useUserStore = defineStore('user', () => {
             return false
         }
     } 
+    socket.on('loginUser', (insertedUser) => {
+        toast.info(`User #${insertedUser.id} (${insertedUser.name}) has registered successfully!`)
+        })
     
     async function deleteAcountVCard() {
         try {
