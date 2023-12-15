@@ -11,7 +11,7 @@ const userStore = useUserStore()
 
 const credentialsProfile = ref({
       id: userStore.userId,
-      currentPassword: null, // Add this for the current password
+      currentPassword: null, 
       password: null,
       confirmation_code: null,
   })

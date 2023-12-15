@@ -4,10 +4,10 @@ import { useToast } from "vue-toastification"
 import { useUserStore } from "../../stores/user.js"
 import { useTransactionsStore } from "../../stores/transactions.js"
 import { useRouter, onBeforeRouteLeave } from 'vue-router'
-import { ref, watch, computed } from 'vue'
+import { ref, watch, computed, inject } from 'vue'
 
 import TransactionDetail from "./TransactionDetail.vue"
-
+const socket = inject("socket");
 const toast = useToast()
 const router = useRouter()
 const userStore = useUserStore()
@@ -55,9 +55,11 @@ const save = async () => {
       console.log(transaction.value)
       const response = await axios.post('transactions/credit', transaction.value)
       transaction.value = response.data.data
+      
       //console.log(transaction.value)
       originalValueStr = 1;//JSON.stringify(transaction.value)
       toast.success('Transação criada com sucesso!')
+      socket.emit('newTransaction', response.data.data)
       router.push({ name: 'TransactionsAll'})
     } catch (error) {
       if (error.response.status == 422) {

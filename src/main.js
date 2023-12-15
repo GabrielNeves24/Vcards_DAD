@@ -6,7 +6,8 @@ import "bootstrap"
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import axios from 'axios'
-
+import {io} from 'socket.io-client'
+ 
 import Toast from "vue-toastification"
 // Import the Toast CSS (or use your own)!
 import "vue-toastification/dist/index.css"
@@ -18,7 +19,7 @@ import App from './App.vue'
 import router from './router'
 
 const app = createApp(App)
-
+app.provide('socket', io("http://localhost:8081"))
 const serverBaseUrl = 'http://dad-202324-payments-api.test:8080'
 app.provide('serverBaseUrl', serverBaseUrl)  
 // Default Axios configuration

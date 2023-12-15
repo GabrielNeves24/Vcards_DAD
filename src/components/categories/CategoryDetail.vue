@@ -8,7 +8,7 @@
     },
     operationType: {
       type: String,
-      default: 'insert'  // insert / update
+      default: 'insert' 
     },
     categories: {
       type: Array,
@@ -82,8 +82,8 @@
         v-model="editingCategory.type"
         required
       >
-        <option value="D">Debit</option>
-        <option value="C">Credit</option>
+        <option value="D">Débito</option>
+        <option value="C">Crédito</option>
       </select>
       <field-error-message :errors="errors" fieldName="type"></field-error-message>
     </div>
@@ -91,7 +91,7 @@
       <label
         for="name"
         class="form-label"
-      >name</label>
+      >Nome</label>
       <input
         type="text"
         class="form-control"
@@ -108,12 +108,12 @@
         type="button"
         class="btn btn-primary px-5"
         @click="save"
-      >Save</button>
+      >Guardar</button>
       <button
         type="button"
         class="btn btn-light px-5"
         @click="cancel"
-      >Cancel</button>
+      >Cancelar</button>
     </div>
   </form>
 </template>

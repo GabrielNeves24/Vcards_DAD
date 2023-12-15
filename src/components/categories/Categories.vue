@@ -4,9 +4,12 @@ import { useRouter } from 'vue-router'
 import { useUserStore } from "../../stores/user.js"
 import { ref, computed, onMounted } from 'vue'
 import CategoryTable from "./CategoryTable.vue"
+import { useToast } from "vue-toastification"
 
 const router = useRouter()
 const userStore = useUserStore()
+const toast = useToast()
+
 
 const loadCategories = async () => {
  if (userStore.userType == 'A'){
@@ -14,14 +17,14 @@ const loadCategories = async () => {
       const response = await axios.get('categories/defaults')
       categories.value = response.data.data
     } catch (error) {
-      console.log(error)
+      toast.error('Erro ao carregar categorias')
     }
   }else{
       try {
         const response = await axios.get('vcards/' + userStore.userId + '/categories')
         categories.value = response.data.data
       } catch (error) {
-        console.log(error)
+        toast.error('Erro ao carregar categorias')
       }
   }
 }
@@ -60,8 +63,8 @@ const props = defineProps({
 
 
 const categories = ref([])
-const filterByName = ref('') // New ref for filtering by name
-const filterByType = ref(-1) // New ref for filtering by type (debit/credit)
+const filterByName = ref('') 
+const filterByType = ref(-1) 
 const currentPage = ref(1);
 
 const filteredCategories2 = computed( () => {
@@ -78,7 +81,7 @@ const filteredCategories2 = computed( () => {
   const totalFiltered = filtered.length;
   const start = (currentPage.value - 1) * itemsPerPage;
   const end = Math.min(start + itemsPerPage, totalFiltered);
-  console.log(filtered)
+  
   return filtered.slice(start, end);
 });
 
@@ -123,15 +126,15 @@ onMounted (() => {
     class="mb-3 d-flex justify-content-between flex-wrap">
     <div class="mx-2 mt-2 flex-grow-1 filter-div">
       <div class="mx-2 mt-2 flex-grow-1 filter-div">
-      <label for="filterByName" class="form-label">Filter by Name:</label>
+      <label for="filterByName" class="form-label">Filtro por Nome:</label>
       <input class="form-control" id="filterByName" v-model="filterByName" />
     </div>
     <div class="mx-2 mt-2 flex-grow-1 filter-div">
-      <label for="filterByType" class="form-label">Filter by Type:</label>
+      <label for="filterByType" class="form-label">Filtro por Tipo:</label>
       <select class="form-select" id="filterByType" v-model="filterByType">
-        <option value="-1">Any</option>
-        <option value="D">Debit</option>
-        <option value="C">Credit</option>
+        <option value="-1">Todas</option>
+        <option value="D">Débito</option>
+        <option value="C">Crédito</option>
       </select>
     </div>
     </div>

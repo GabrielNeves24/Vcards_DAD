@@ -64,13 +64,15 @@ const deletedVcard =async  (deletedVcard) => {
       try {
         // delete from the API
         const responseDelete = await axios.delete(`/vcards/${deletedVcard.phone_number}`, deletedVcard);
+        console.log(responseDelete.data.data)
+
+
         // delete from the local array
         // Show a success alert
-        toast.sucess(responseDelete.data.message);
-        loadVcards();
-        
+        toast.success(responseDelete.data.message);
+        loadVcards()
         } catch (error) {
-          toast.error("erro ao eliminar o vcard");
+          toast.error("Erro ao eliminar o vcard");
             console.error('Erro ao obter vcards:', error);
         }    
 }

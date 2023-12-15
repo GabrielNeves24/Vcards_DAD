@@ -170,7 +170,7 @@ const clickMenuOption = () => {
                 <router-link class="nav-link" :class="{ active: $route.name === 'Users' }" 
                             :to="{ name: 'Users' }" @click="clickMenuOption">
                   <i class="bi bi-files"></i>
-                    Gestão Users
+                    Gestão Administradores
                 </router-link>
             </li>
             <!-- <li class="nav-item">

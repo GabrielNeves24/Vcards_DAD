@@ -33,23 +33,19 @@ const emit = defineEmits(['profile'])
 
 
 const profile = async () => {
-  // Check if no changes were made
   if (initialData.name == credentialsProfile.value.name && 
       initialData.email == credentialsProfile.value.email && 
       credentialsProfile.value.photo_url == null) {
         toast.error('Sem alterações');
         return;
     }
-    //if only alter name and email do the followingprofile
     if (initialData.name != credentialsProfile.value.name || initialData.email != credentialsProfile.value.email || credentialsProfile.value.photo_url != null) {
-      //console.log(await userStore.profile(credentialsProfile,'perfil'))
       const formData = new FormData();
       for (const key in credentialsProfile.value) {
           formData.append(key, credentialsProfile.value[key]);
       }
       if (await userStore.profile(formData)) {
         toast.success('Perfil atualizado com sucesso.');
-        //emit('profile');
         router.push({ name: 'Dashboard' });
       } else {
         toast.error('Erro ao atualizar perfil!');
@@ -78,9 +74,7 @@ const fetchData = async () => {
           const data = response.data.data;
           credentialsProfile.value.name = data.name;
           credentialsProfile.value.email = data.email;
-          //credentialsProfile.value.photo_url = data.photo_url;
           initialData.name = data.name;
-          //initialData.id = data.id
           initialData.email = data.email;
         } else {
           const response = await axios.get(`/users/${userStore.userId}`);
@@ -104,7 +98,7 @@ onMounted(() => {
 <template>
   <div class="container">
     <div class="row">
-      <!-- User Information and Form Fields on the Left -->
+      
       <div class="col-md-6">
         <form
           class="row g-3 needs-validation"
@@ -156,8 +150,8 @@ onMounted(() => {
   width: 100%;
   height: auto;
   object-fit: cover;
-  border-radius: 10px; /* Rounded corners */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: add shadow for depth */
+  border-radius: 10px; 
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
 }
 </style>
 

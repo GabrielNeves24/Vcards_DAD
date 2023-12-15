@@ -2,11 +2,12 @@
 import axios from 'axios'
 import { useRouter } from 'vue-router'
 import { useUserStore } from "../../stores/user.js"
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, inject } from 'vue'
 import UserList from "./UserList.vue"
 import { useToast } from "vue-toastification"
 import * as XLSX from 'xlsx'
 
+const socket = inject("socket");
 const router = useRouter()
 const userStore = useUserStore()
 const toast = useToast()
@@ -43,11 +44,15 @@ const newUser = ref({
   email: '',
   password: ''
 });
+socket.on('insertedUser', (insertedUser) => {
+        toast.info(`User #${insertedUser.id} (${insertedUser.name}) has registered successfully!`)
+        })
 
 const saveNewUser = async () => {
   try {
     await axios.post('users', newUser.value);
     toast.success('Utilizador  criado com sucesso!');
+    socket.emit('insertedUser', newUser.value)
     newUser.value = { name: '', email: '', password: '' }; // Reset form
     showAddUserForm.value = false; // Hide form
     await loadUsers(); // Reload users list

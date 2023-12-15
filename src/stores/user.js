@@ -10,7 +10,7 @@ export const useUserStore = defineStore('user', () => {
 
     const serverBaseUrl = inject('serverBaseUrl')
     const transactionsStore = useTransactionsStore()
-
+    const socket = inject("socket")
     const toast = useToast()
     const user = ref(null)
 
@@ -34,6 +34,7 @@ export const useUserStore = defineStore('user', () => {
         try {
             const response = await axios.get('users/me')
             user.value = response.data.data
+            socket.emit('loginUser', user.value)
         } catch (error) {
             clearUser()
             
@@ -55,7 +56,9 @@ export const useUserStore = defineStore('user', () => {
             console.log(response.data.access_token)
             axios.defaults.headers.common.Authorization = "Bearer " + response.data.access_token
             sessionStorage.setItem('token', response.data.access_token)
+            
             await loadUser()
+            socket.emit('loggedIn', user.value)
             return true       
         } 
         catch(error) {
@@ -68,6 +71,9 @@ export const useUserStore = defineStore('user', () => {
             return false
         }
     } 
+    socket.on('loginUser', (insertedUser) => {
+        toast.info(`User #${insertedUser.id} (${insertedUser.name}) has registered successfully!`)
+        })
     
     async function deleteAcountVCard() {
         try {
@@ -186,6 +192,7 @@ export const useUserStore = defineStore('user', () => {
     async function logout () {
         try {
             await axios.post('logout', sessionStorage.getItem('token'))
+            socket.emit('loggedOut', user.value)
             clearUser()
             return true
         } catch (error) {
@@ -199,6 +206,7 @@ export const useUserStore = defineStore('user', () => {
             axios.defaults.headers.common.Authorization = "Bearer " + storedToken
             await loadUser()
             // await projectsStore.loadProjects()
+            socket.emit('loggedIn', user.value)
             return true
         }
         clearUser()
@@ -213,6 +221,8 @@ export const useUserStore = defineStore('user', () => {
     //         return false;
     //     }
     // }
+
+    
 
     return {
         user,

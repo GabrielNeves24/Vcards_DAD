@@ -18,14 +18,11 @@ const credentialsRegsiter = ref({
       photo_url: ''
   })
 
-
-// ... existing imports and setup
-
 const photoPreview = computed(() => {
   if (credentialsRegsiter.value.photo_url && typeof credentialsRegsiter.value.photo_url === 'object') {
     return URL.createObjectURL(credentialsRegsiter.value.photo_url);
   }
-  return null; // Return null if no photo is selected
+  return null; 
 });
 
 
@@ -56,20 +53,17 @@ const register = async () => {
 function handleApiErrors(error) {
     if (error.response && error.response.data) {
         if (error.response.data.error && Array.isArray(error.response.data.error)) {
-            // If the error is an array of messages
+           
             error.response.data.error.forEach(message => {
                 toast.error(message);
             });
         } else if (error.response.data.error) {
-            // If it's a single error message
             toast.error(error.response.data.error);
         } else {
-            // General error message
-            toast.error('An unexpected error occurred!');
+            toast.error('Erro ao criar conta!');
         }
     } else {
-        // Fallback error message
-        toast.error('An unexpected error occurred!');
+        toast.error('Erro ao criar conta!');
     }
 }
 
@@ -82,7 +76,6 @@ function handleApiErrors(error) {
     @submit.prevent="register"
   >
   <div class="row">
-    <!-- Form Fields on the Left -->
     <div class="col-md-8">
       <h3 class="mt-5 mb-3">Login</h3>
       <hr>
@@ -184,19 +177,19 @@ function handleApiErrors(error) {
 
 <style scoped>
 .image-upload-container {
-  text-align: center; /* Center the content */
-  padding-top: 20px; /* Add some spacing */
+  text-align: center;
+  padding-top: 20px; 
 }
 
 .image-preview-container {
   margin-bottom: 10px;
-  width: 100%; /* Full width of the container */
-  max-width: 200px; /* Max width of the image */
+  width: 100%; 
+  max-width: 200px;
   height: 200px;
   border: 1px solid #ddd;
   border-radius: 10px;
   overflow: hidden;
-  margin-left: auto; /* Center the image preview */
+  margin-left: auto; 
   margin-right: auto;
 }
 
@@ -206,23 +199,23 @@ function handleApiErrors(error) {
   object-fit: cover;
 }
 
-/* Adjust the button styles if needed */
+
 .btn-danger {
-  width: 100%; /* Full width of the container */
-  max-width: 200px; /* Max width of the button */
-  margin-left: auto; /* Center the button */
+  width: 100%; 
+  max-width: 200px; 
+  margin-left: auto; 
   margin-right: auto;
 }
 
 .image-placeholder {
-  width: 200px; /* Adjust as needed */
-  height: 200px; /* Adjust as needed */
-  background-color: #ddd; /* Gray color */
-  border-radius: 10px; /* Rounded corners, optional */
+  width: 200px; 
+  height: 200px; 
+  background-color: #ddd; 
+  border-radius: 10px; 
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px; /* Optional, if you want to add text */
-  color: #333; /* Text color, optional */
+  font-size: 24px; 
+  color: #333;
 }
 </style>

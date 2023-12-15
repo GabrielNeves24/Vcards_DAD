@@ -69,8 +69,8 @@ const editClick = (transaction) => {
         <th>Categoria</th>
         <th>Descrição</th>
 
-        <th v-show="userStore.userType == 'A'">Old Balance</th>
-        
+        <th>Old Balance</th>
+        <th>new Balance</th>
         <th v-if="showEditButton"></th>
       </tr>
     </thead>
@@ -81,11 +81,12 @@ const editClick = (transaction) => {
         <td>{{ transaction.payment_type }}</td>
         <td>{{ transaction.payment_reference }}</td>
         <td v-show="userStore.userType == 'A'">{{ transaction.type }}</td>
-        <td :class="{'text-green': transaction.type === 'D', 'text-red': transaction.type !== 'D'}">{{ transaction.type === 'D' ? transaction.value : -transaction.value }}</td>
+        <td :class="{'text-red': transaction.type === 'D', 'text-green': transaction.type !== 'D'}">{{ transaction.type === 'D' ? -transaction.value : transaction.value }}</td>
+
         <td>{{ !transaction.category ? 'N/A' : transaction.category }}</td>
         <td>{{ transaction.description }}</td>
-        
-        <td v-show="userStore.userType == 'A'">{{ transaction.old_balance }}</td>
+        <td>{{ transaction.new_balance }}</td>        
+        <td>{{ transaction.old_balance }}</td>
         
         <td 
           class="text-end"

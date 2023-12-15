@@ -1,12 +1,40 @@
 <template>
   <div class="spending-chart-container">
     <Chart
-      :size="{ width: 650, height: 200 }"
+      :size="{ width: 700, height: 300 }"
       :data="spendingDataCombined"
-      :margin="{ top: 10, right: 10, bottom: 10, left: 10 }">
+      :margin="{ left: 0, top: 20, right: 20, bottom: 0 }"
+      :direction="'horizontal'"
+      :axis="axis"
+    >
       <template #layers>
         <Grid strokeDasharray="2,2" />
-        <Line :dataKeys="['date', 'total']" stroke="green" />
+        <Area 
+          :dataKeys="['data', 'saldo']" 
+          type="monotone" 
+          :areaStyle="{ fill: 'url(#grad)' }" 
+        />
+        <Line 
+          :dataKeys="['data', 'saldo']" 
+          type="monotone" 
+          :lineStyle="{ stroke: '#9f7aea' }" 
+        />
+        <defs>
+          <linearGradient id="grad" gradientTransform="rotate(90)">
+            <stop offset="0%" stop-color="#be90ff" stop-opacity="1" />
+            <stop offset="100%" stop-color="white" stop-opacity="0.4" />
+          </linearGradient>
+        </defs>
+      </template>
+      <template #widgets>
+        <Tooltip
+          borderColor="#48CAE4"
+          :config="{
+            total: { color: '#9f7aea' },
+            avg: { hide: true },
+            inc: { hide: true }
+          }"
+        />
       </template>
     </Chart>
   </div>
@@ -15,25 +43,34 @@
   
 <script setup>
 import { ref, onMounted } from 'vue';
-import { Chart, Grid, Line } from 'vue3-charts';
+import { Chart, Grid, Line, Area, Tooltip } from 'vue3-charts';
 import axios from 'axios';
 import { useUserStore } from '../../stores/user';
 
 const userStore = useUserStore();
 const spendingDataCombined = ref([]);
 
+const axis = ref({
+  primary: {
+    type: 'band'
+  },
+  secondary: {
+    domain: ['dataMin', 'dataMax + 100'],
+    type: 'linear',
+    ticks: 8
+  }
+});
+
 const fetchLast30DaysSpending = async () => {
   try {
     const response = await axios.get(`vcards/${userStore.userId}/transactions/last30days`);
     const data = response.data.data;
-
-    // Process the received data
     spendingDataCombined.value = data.map(transaction => ({
-      date: transaction.date,
-      total: transaction.running_balance // This combines the two
+      data: transaction.date,
+      saldo: transaction.running_balance 
     }));
   } catch (error) {
-    console.error('Error fetching last 30 days spending data:', error);
+    console.error('Error ao obter dados:', error);
   }
 };
 
@@ -63,27 +100,27 @@ onMounted(() => {
   margin-bottom: 20px;
 }
 
-/* Style for the line representing the balance */
+
 .line-balance {
   stroke: #005cc5;
   stroke-width: 3;
-  fill: none; /* Ensures the area under the line isn't filled */
+  fill: none; 
 }
 
-/* Enhance dots on the line for better visibility */
+
 .dot {
   fill: #005cc5;
   stroke: #fff;
   stroke-width: 2;
 }
 
-/* Style for the chart axes */
+
 .axis {
   font-size: 14px;
   color: #666;
 }
 
-/* Hide grid lines */
+
 .grid-line {
   display: none;
 }
