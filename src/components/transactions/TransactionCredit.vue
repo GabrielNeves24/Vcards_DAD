@@ -59,7 +59,9 @@ const save = async () => {
       //console.log(transaction.value)
       originalValueStr = 1;//JSON.stringify(transaction.value)
       toast.success('Transação criada com sucesso!')
-      socket.emit('newTransaction', response.data.data)
+      
+      
+
       router.push({ name: 'TransactionsAll'})
     } catch (error) {
       if (error.response.status == 422) {
@@ -71,6 +73,8 @@ const save = async () => {
     }
   }   
 }
+
+
 
 const cancel = () => {
   originalValueStr = JSON.stringify(transaction.value)

@@ -4,7 +4,7 @@ import { useToast } from "vue-toastification"
 import { useUserStore } from "../../stores/user.js"
 import { useTransactionsStore } from "../../stores/transactions.js"
 import { useRouter, onBeforeRouteLeave } from 'vue-router'
-import { ref, watch, computed } from 'vue'
+import { ref, watch, computed, inject } from 'vue'
 
 import TransactionDetail from "./TransactionDetail.vue"
 
@@ -12,6 +12,7 @@ const toast = useToast()
 const router = useRouter()
 const userStore = useUserStore()
 const transactionStore = useTransactionsStore()
+const socket = inject("socket");
 
 const newTransaction = () => { 
   return {
@@ -77,6 +78,8 @@ const save = async () => {
             //console.log(transaction.value)
             originalValueStr = JSON.stringify(transaction.value)
             toast.success('Transação criada com sucesso!')
+            socket.emit('adminTransaction', transaction.value);
+            console.log("emitido")
             router.back()
             router.push({ name: 'Transactions' })
           }
@@ -96,8 +99,10 @@ const save = async () => {
                 category_id: transaction.value.category_id,
                 description: transaction.value.description,
               })
+              socket.emit('debitTransaction', transaction.value);
           transaction.value = response.data.data
           //console.log(transaction.value)
+          
           originalValueStr = JSON.stringify(transaction.value)
           toast.success('Transação criada com sucesso!')
           router.push({ name: 'Transactions' })
@@ -156,6 +161,16 @@ const save = async () => {
     }
   }
 }
+socket.on('newTransaction', (transaction) => {
+  toast.success('Você recebeu uma nova transação!');
+  console.log("Transaction received:", transaction);
+  if (transaction.vcard === userStore.userId) {
+    console.log('Trying to show toast');
+    toast.success('Você recebeu uma nova transação!');
+    console.log('Toast should be shown');
+  }
+});
+
 
 const cancel = () => {
   originalValueStr = JSON.stringify(transaction.value)

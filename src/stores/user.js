@@ -34,7 +34,7 @@ export const useUserStore = defineStore('user', () => {
         try {
             const response = await axios.get('users/me')
             user.value = response.data.data
-            socket.emit('loginUser', user.value)
+            
         } catch (error) {
             clearUser()
             
@@ -59,10 +59,11 @@ export const useUserStore = defineStore('user', () => {
             
             await loadUser()
             socket.emit('loggedIn', user.value)
+            //socket.emit('userLoggedIn', user.value)
+            socket.emit('loginUser', user.value)
             return true       
         } 
         catch(error) {
-            //get the error message coming {"error":"VCard eliminado"}
             console.log(error.response.data.error)
             const message = error.response.data.error
             toast.error(message)
@@ -71,9 +72,46 @@ export const useUserStore = defineStore('user', () => {
             return false
         }
     } 
-    socket.on('loginUser', (insertedUser) => {
-        toast.info(`User #${insertedUser.id} (${insertedUser.name}) has registered successfully!`)
+    socket.on('userLoggedOut', (user) => {
+        toast.info(`User #${user.id} (${user.name}) has logged out!`)
         })
+    socket.on('loginUser', (user) => {
+        if (user.id != userId.value)
+        toast.info(`User #${user.id} (${user.name}) has logged in!`)
+        })
+
+    // socket.on('userLoggedIn', (user) => {
+    //     //if (user.id != userId.value)
+    //     console.log(user)
+    //     toast.info(`User #${user.id} (${user.name}) has registered successfully!`)
+    //     })
+
+    async function teste (transaction){
+        socket.emit('adminTransaction', transaction.value);
+    }
+    socket.on('newTransaction', (transaction) => {
+        console.log(transaction.vcard + " " + userId.value)
+                if (transaction.vcard === userId.value) { // Ensure this is the correct vCard user
+                    toast.success('Recebeu uma nova transação (Crédito do Administrador)! '+ transaction.value + ' €');
+                }
+                //now i need to resfresh the balance of the user that received the transaction
+            });
+    socket.on('receivedDebit', (transaction) => {
+        // Assume 'userStore' is your user state management, and it contains the current user's vCard ID
+        console.log(transaction.reference + " " + userId.value)
+        if (transaction.reference == userId.value) {
+            toast.success('Recebeu uma nova transação de (Débito)! '+ transaction.value + ' €');
+        }
+    });   
+    
+    socket.on('blockUser', (vcard) => {
+        // Assume 'userStore' is your user state management, and it contains the current user's vCard ID
+        console.log(vcard + " " + userId.value)
+        if (vcard == userId.value) {
+            toast.error('A sua conta foi bloqueada!');
+            logout()
+        }
+    });
     
     async function deleteAcountVCard() {
         try {
@@ -241,5 +279,6 @@ export const useUserStore = defineStore('user', () => {
         verifyPassword,
         verifyPin,
         deleteAcountVCard,
+        teste
     }
 })

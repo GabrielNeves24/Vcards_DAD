@@ -2,11 +2,12 @@
 import axios from 'axios'
 import { useRouter } from 'vue-router'
 import { useUserStore } from "../../stores/user.js"
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, inject } from 'vue'
 import VcardList from "./VcardList.vue"
 import { useToast } from "vue-toastification"
 import * as XLSX from 'xlsx'
 
+const socket = inject("socket");
 const router = useRouter()
 const userStore = useUserStore()
 const toast = useToast()
@@ -54,6 +55,10 @@ const editVcard = async (vcard) => {
         // update the local copy of the data
         console.log(response.data.data)
         toast.success('Dados atualizados com sucesso!')
+        //if the user has change to blocked, send a message to the user
+        if (vcard.blocked == 1){
+          socket.emit("blockUser", vcard.phone_number);
+        }
         loadVcards()
     } catch (error) {
       toast.error('Erro ao atualizar os dados!')
