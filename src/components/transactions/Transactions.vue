@@ -23,6 +23,16 @@ const loadTransactions = async () => {
       try {
       const response = await axios.get('transactions')
       transactions.value = response.data.data
+      const response2 = await axios.get('categories/all')
+      categories.value = response2.data.data
+        //for each category_id on transactions, show the name of the category
+        transactions.value.forEach(function (v) {
+          categories.value.forEach(function (c) {
+            if (v.category_id == c.id) {
+              v.category = c.name
+            }
+          });
+        });
     } catch (error) {
       console.log(error)
     }
