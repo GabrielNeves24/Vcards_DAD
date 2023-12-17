@@ -2,15 +2,12 @@
 import axios from 'axios'
 import { useRouter } from 'vue-router'
 import { useUserStore } from "../../stores/user.js"
-import { useTransactionsStore } from "../../stores/transactions.js"
 import { ref, computed, onMounted } from 'vue'
 import TransactionTable from "./TransactionTable.vue"
 import * as XLSX from 'xlsx'
 
 const router = useRouter()
 const userStore = useUserStore()
-const transactionsStore = useTransactionsStore()
-
 const exportToExcel = () => {
   const ws = XLSX.utils.json_to_sheet(transactions.value);
   const wb = XLSX.utils.book_new();
@@ -35,7 +32,6 @@ const loadTransactions = async () => {
     transactions.value = response.data.data
     const response2 = await axios.get('vcards/' + userStore.userId + '/categories')
       categories.value = response2.data.data
-      //when i get the transactions i want to add the category name to show in the table and with value of the category id
       transactions.value.forEach(function (v) {
         categories.value.forEach(function (c) {
           if (v.category_id == c.id) {
@@ -48,28 +44,6 @@ const loadTransactions = async () => {
   }
   }
 }
-// const loadCategories = async () => {
-//   if (userStore.userId == null) {
-//     return
-//   }
-//   if (userStore.userType == 'V') {
-//       try {
-//       const response = await axios.get('vcards/' + userStore.userId + '/categories')
-//       categories.value = response.data.data
-//       //when i get the transactions i want to add the category name to show in the table and with value of the category id
-//       transactions.value.forEach(function (v) {
-//         categories.value.forEach(function (c) {
-//           if (v.category_id == c.id) {
-//             v.category = c.name
-//           }
-//         });
-//       });
-//       console.log(transactions.value)
-//     } catch (error) {
-//       console.log(error)
-//     }
-//   }
-// }
 
 const addTransaction = () => {
     router.push({ name: 'NewTransaction' })
@@ -92,8 +66,8 @@ TransactionsTitle: {
 })
 const categories = ref([])
 const transactions = ref([])
-const filterByType = ref(-1); // 'Debit', 'Credit', or '' for all
-const sortBy = ref('date'); // 'date' or 'description'
+const filterByType = ref(-1); 
+const sortBy = ref('date'); 
 const filterByDescription = ref('')
 const currentPage = ref(1);
 const itemsPerPage = 10;
@@ -105,39 +79,29 @@ const filterByCategory = ref(-1);
 
 const filteredTransactions = computed(() => {
   let filtered = transactions.value;
-
-  // Filter by transaction type
   if (filterByType.value != -1) {
     filtered = filtered.filter(t => t.type === filterByType.value);
   }
-
   if (filterByTypePayment.value != -1) {
     filtered = filtered.filter(t => t.payment_type === filterByTypePayment.value);
   }
-  // Filter by description
   if (filterByDescription.value) {
     filtered = filtered.filter(t =>
       t.description && t.description.toString().includes(filterByDescription.value)
     );
   }
-
-  // Filter by date
   if (filterByDate.value != null) {
     const selectedDatetime = new Date(filterByDate.value);
     filtered = filtered.filter(t => {
-      const transactionDatetime = new Date(t.datetime); // Assuming 'datetime' is the field name
+      const transactionDatetime = new Date(t.datetime);
       return transactionDatetime >= selectedDatetime;
     });
   }
-
-  //Filter by category
   if (filterByCategory.value != -1) {
     filtered = filtered.filter(t => t.category_id === filterByCategory.value);
   }
-
-  // Sorting
   filtered = filtered.sort((a, b) => {
-    const datetimeA = new Date(a.datetime); // Assuming 'datetime' is the field name
+    const datetimeA = new Date(a.datetime); 
     const datetimeB = new Date(b.datetime);
     if (sortBy.value === 'date') {
       return sortOrder.value === 'asc' ? datetimeA - datetimeB : datetimeB - datetimeA;
@@ -167,14 +131,12 @@ const updatePage = (direction) => {
 };
 
 const totalTransactions = computed(() => {
-  //filteredTransactions is paginaterd get all transactions length
   return transactions.value.length
 });
 
 
 onMounted (() => {
   loadTransactions()
-  //loadCategories()
 })
 </script>
 

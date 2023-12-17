@@ -23,7 +23,6 @@ VcardsTitle: {
 })
 
 const exportToExcel = () => {
-  // remove password and confirm_password from the export
   vcards.value.forEach(function (v) {
     delete v.password;
     delete v.confirmation_code;
@@ -43,19 +42,11 @@ const loadVcards = async () => {
     console.log(error)
   }
 }
-
-  // const addTransaction = () => {
-  //     router.push({ name: 'NewTransaction' })
-  // }
-
 const editVcard = async (vcard) => {
   try{
-        // update the API
         const response = await axios.put(`/vcards/user/${vcard.phone_number}`, vcard);
-        // update the local copy of the data
         console.log(response.data.data)
         toast.success('Dados atualizados com sucesso!')
-        //if the user has change to blocked, send a message to the user
         if (vcard.blocked == 1){
           socket.emit("blockUser", vcard.phone_number);
         }
@@ -67,13 +58,9 @@ const editVcard = async (vcard) => {
 
 const deletedVcard =async  (deletedVcard) => {
       try {
-        // delete from the API
         const responseDelete = await axios.delete(`/vcards/${deletedVcard.phone_number}`, deletedVcard);
         console.log(responseDelete.data.data)
         socket.emit("deleteUser", deletedVcard.phone_number);
-
-        // delete from the local array
-        // Show a success alert
         toast.success(responseDelete.data.message);
         loadVcards()
         } catch (error) {
@@ -95,7 +82,6 @@ const deletedVcard =async  (deletedVcard) => {
       filtered = filtered.filter(v => v.blocked == filterByBlocked.value)
     }
     if (filterByName.value) {
-      //filter y phone_number or by name
       filtered = filtered.filter(v =>
         v.name && v.name.toString().includes(filterByName.value)
       );

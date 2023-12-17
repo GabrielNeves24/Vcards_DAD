@@ -5,7 +5,6 @@ import { useUserStore } from "../../stores/user.js"
 import { useTransactionsStore } from "../../stores/transactions.js"
 import { useRouter, onBeforeRouteLeave } from 'vue-router'
 import { ref, watch, computed, inject } from 'vue'
-
 import TransactionDetail from "./TransactionDetail.vue"
 
 const toast = useToast()
@@ -18,7 +17,6 @@ const newTransaction = () => {
   return {
     id: null,
     vcard: null,
-    //type: null,
     value: null,
     type: null,
     reference: null,
@@ -30,7 +28,6 @@ const newTransaction = () => {
 const transaction = ref(newTransaction())
 const errors = ref(null)
 const confirmationLeaveDialog = ref(null)
-// String with the JSON representation after loading the project (new or edit)
 let originalValueStr = ''
   
 const loadTransactions = async (id) => {
@@ -55,7 +52,6 @@ const save = async () => {
   if (operation.value == 'insert') {
     try {
       console.log(transaction.value)
-      //add type to transaction
       if (userStore.userType == 'A'){
         try {
           const response = await axios.post(`https://dad-202324-payments-api.vercel.app/api/credit`, {
@@ -65,7 +61,6 @@ const save = async () => {
           });
           if (response.status === 201) {
             toast.success('Transaction processed successfully! na api');
-            //transaction.value.type = 'C'
             const response = await axios.post('transactions/credit', {
               vcard: transaction.value.vcard,
               payment_type: transaction.value.type,
@@ -75,7 +70,6 @@ const save = async () => {
               description: transaction.value.description,
             })
             transaction.value = response.data.data
-            //console.log(transaction.value)
             originalValueStr = JSON.stringify(transaction.value)
             toast.success('Transação criada com sucesso!')
             socket.emit('adminTransaction', transaction.value);
@@ -90,7 +84,6 @@ const save = async () => {
       }else{
           
         if(transaction.value.type == 'VCARD'){
-          //transaction.value.type = 'D'
           const response = await axios.post('transactions/debit', {
                 vcard: userStore.userId,
                 payment_type: transaction.value.type,
@@ -115,7 +108,6 @@ const save = async () => {
             });
             if (response.status === 201) {
               toast.success('Transaction processed successfully! na api');
-              //transaction.value.type = 'D'
               const response = await axios.post('transactions/debit', {
                 vcard: userStore.userId,
                 payment_type: transaction.value.type,
@@ -125,7 +117,6 @@ const save = async () => {
                 description: transaction.value.description,
               })
               transaction.value = response.data.data
-              //console.log(transaction.value)
               originalValueStr = JSON.stringify(transaction.value)
               toast.success('Transação criada com sucesso!')
               router.push({ name: 'Transactions' })
@@ -187,12 +178,7 @@ const props = defineProps({
     default: null
   }
 })
-
-
 const operation = computed( () => (!props.id || props.id < 0) ? 'insert' : 'update')
-
-  // beforeRouteUpdate was not fired correctly
-  // Used this watcher instead to update the ID
 watch(
   () => props.id,
   (newValue) => {
@@ -214,11 +200,9 @@ onBeforeRouteLeave((to, from, next) => {
   nextCallBack = null
   let newValueStr = originalValueStr
   if (originalValueStr != newValueStr) {
-    // Some value has changed - only leave after confirmation
     nextCallBack = next
     confirmationLeaveDialog.value.show()
   } else {
-    // No value has changed, so we can leave the component without confirming
     next()
   }
 })

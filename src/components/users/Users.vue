@@ -22,7 +22,6 @@ const loadUsers = async () => {
 }
 
 const exportToExcel = () => {
-  //remove password and confirm_password from the export
   users.value.forEach(function (v) {
     delete v.password;
     delete v.confirmation_code;
@@ -53,9 +52,9 @@ const saveNewUser = async () => {
     await axios.post('users', newUser.value);
     toast.success('Utilizador  criado com sucesso!');
     socket.emit('insertedUser', newUser.value)
-    newUser.value = { name: '', email: '', password: '' }; // Reset form
-    showAddUserForm.value = false; // Hide form
-    await loadUsers(); // Reload users list
+    newUser.value = { name: '', email: '', password: '' }; 
+    showAddUserForm.value = false; 
+    await loadUsers(); 
   } catch (error) {
     console.error(error);
   }
@@ -101,7 +100,6 @@ const users = ref([])
   const filteredVcards = computed( () => {
     let filtered = users.value;
     if (filterByName.value) {
-      //filter y phone_number or by name
       filtered = filtered.filter(v =>
         v.name && v.name.toString().includes(filterByName.value)
       );

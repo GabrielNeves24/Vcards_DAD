@@ -17,7 +17,6 @@ const newTransaction = () => {
   return {
     id: null,
     vcard: null,
-    //type: 'C',
     value: null,
     type: null,
     reference: null,
@@ -28,7 +27,6 @@ const newTransaction = () => {
 const transaction = ref(newTransaction())
 const errors = ref(null)
 const confirmationLeaveDialog = ref(null)
-// String with the JSON representation after loading the project (new or edit)
 let originalValueStr = ''
   
 const loadTransactions = async (id) => {
@@ -55,9 +53,7 @@ const save = async () => {
       console.log(transaction.value)
       const response = await axios.post('transactions/credit', transaction.value)
       transaction.value = response.data.data
-      
-      //console.log(transaction.value)
-      originalValueStr = 1;//JSON.stringify(transaction.value)
+      originalValueStr = 1;
       toast.success('Transação criada com sucesso!')
       
       
@@ -94,9 +90,6 @@ const props = defineProps({
 
 
 const operation = computed( () => (!props.id || props.id < 0) ? 'insert' : 'update')
-
-  // beforeRouteUpdate was not fired correctly
-  // Used this watcher instead to update the ID
 watch(
   () => props.id,
   (newValue) => {
@@ -116,11 +109,9 @@ onBeforeRouteLeave((to, from, next) => {
   nextCallBack = null
   let newValueStr = originalValueStr
   if (originalValueStr != newValueStr) {
-    // Some value has changed - only leave after confirmation
     nextCallBack = next
     confirmationLeaveDialog.value.show()
   } else {
-    // No value has changed, so we can leave the component without confirming
     next()
   }
 })

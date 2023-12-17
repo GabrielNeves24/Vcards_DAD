@@ -6,7 +6,6 @@ import { useToast } from "vue-toastification"
 import { useRouter } from 'vue-router'
 import { useUserStore } from '../stores/user.js'
 import RecentTransactions from '../components/transactions/RecentTransactions.vue';
-//import SpendingChart from '../components/transactions/SpendingChart.vue'
 import CategorySpendingChart from './charts/CategorySpendingChart.vue'
 import Last30DaysSpending from './charts/Last30DaysSpending.vue'
 
@@ -26,7 +25,7 @@ const loadVcard = async () => {
     vcards.value = response.data.data
     console.log(vcards.value)
   } catch (error) {
-    errors.value = "Failed to load data"; // Set error message
+    errors.value = "Failed to load data"; 
     console.log(error)
   }
 }
@@ -54,19 +53,19 @@ onMounted(() => {
           </div>
         </div>
       </div>
-      <!-- Additional sections can be added here -->
+
       <div class="vcard-section">
         
         <div class="vcard-list">
           <div class="vcard">
             <h2 class="section-title">Balanço da conta nos ultimos 30 dias</h2>
             <Last30DaysSpending />
-            <!-- Add more card details here -->
+
           </div>
           <div class="vcard">
             <h2 class="section-title">Ultimas Transações</h2>
             <RecentTransactions />
-            <!-- Add more card details here -->
+
           </div>
         </div>
        
@@ -74,7 +73,7 @@ onMounted(() => {
           <h2 class="section-title">Top 5 categorias gastos </h2>
           <div class="vcard">
             <CategorySpendingChart />
-            <!-- Add more card details here -->
+
           </div>
         </div>
       </div>
@@ -139,7 +138,7 @@ h3, h4 {
   color: #34495E;
 }
 
-/* Additional styling for buttons, inputs, and other elements can be added here */
+
 .user-info {
   text-align: center;
 }
@@ -158,7 +157,7 @@ h3, h4 {
 
 .balance-info {
   text-align: center;
-  background-color: #E8F0FE; /* Light blue background for balance */
+  background-color: #E8F0FE; 
   padding: 15px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -173,6 +172,6 @@ h3, h4 {
 .balance-amount {
   font-size: 22px;
   font-weight: bold;
-  color: #27AE60; /* Green color for balance amount */
+  color: #27AE60; 
 }
 </style>

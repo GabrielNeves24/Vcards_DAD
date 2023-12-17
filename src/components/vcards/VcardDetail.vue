@@ -4,15 +4,13 @@ import avatarNoneUrl from '@/assets/avatar-none.png'
 const props = defineProps({
   vcard: Object
 })
-
-//const projects = inject('projects')
 const serverBaseUrl = inject('serverBaseUrl')
 const emit = defineEmits(['hide', 'requestUpdateVcard'])
 
 const editVcard = ref(Object.assign({}, props.vcard))
 
 const inputDescription = ref(null)
-const showErrors = ref(false) // just for testing the errors presentation/layout
+const showErrors = ref(false) 
 
 const save = () => {
   let vcardToSave = {
@@ -44,7 +42,6 @@ const blockedForDisplay = computed({
 });
 
 onMounted(() => {
-  // Initializing with the focus on the input
   inputDescription.value.focus()
 })
 
@@ -106,7 +103,7 @@ onMounted(() => {
 
 <style scoped>
 .larger-image {
-  max-width: 150px; /* or whatever size you prefer */
+  max-width: 150px;
   height: auto;
 }
 

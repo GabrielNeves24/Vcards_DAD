@@ -1,5 +1,4 @@
 <script setup>
-// TransactionForm.vue
 import { ref } from 'vue';
 
 const props = defineProps({
@@ -11,23 +10,14 @@ const transactionValue = ref(0);
 const payment_type = ref('vCard');
 const transactionReference = ref('');
 const transactiondescription = ref('');
-const selectedCategory = ref(''); // Initialize selectedCategory
-
-
-//click on the button to make a debit transaction
-const isDebitTransactionOpen = ref(false); // This will control the visibility of the debit transaction form
+const selectedCategory = ref('');
+const isDebitTransactionOpen = ref(false);
 const toggleDebitTransaction = () => {
-  isDebitTransactionOpen.value = !isDebitTransactionOpen.value; // Toggle the state
+  isDebitTransactionOpen.value = !isDebitTransactionOpen.value; 
 };
 
-const emit = defineEmits(['updateTransactions']); // Define the event to be emitted
+const emit = defineEmits(['updateTransactions']);
 const emitUpdate = () => emit('updateTransactions');
-
-
-
-
-// Add your transaction logic here
-
 </script>
 
 <template>

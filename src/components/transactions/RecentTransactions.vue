@@ -1,18 +1,14 @@
 <template>
     <div v-if="isRecentTransactionsOpen" class="recent-transactions">
-    <!-- Grouped transactions by date -->
     <div v-for="(groupedTransactions, date) in groupedTransactionsByDate" :key="date" class="transaction-date-group">
       <div class="transaction-date">{{ formatDate(date) }}</div>
       <div class="transaction-list">
-        <!-- Transaction list for each date -->
         <div v-for="transaction in groupedTransactions" :key="transaction.id" class="transaction-card" @click="toggleTransactionDetails(transaction.id)">
-          <!-- Transaction Card Content -->
           <div class="transaction-card-content">
             <div class="transaction-card-info">
               <div class="transaction-payment_reference">{{ transaction.payment_reference }}</div>
               <div class="transaction-category">{{ transaction.category }}</div>
             </div>
-            <!-- <div class="transaction-description">{{ transaction.description }}</div> -->
             <div class="transaction-card-info">
               <div class="transaction-type" :class="{'positive-value': transaction.type !== 'D', 'negative-value': transaction.type === 'D'}">
                 {{ transaction.type === 'D' ? (transaction.value * -1) : transaction.value }}
@@ -39,7 +35,7 @@
   const userStore = useUserStore();
   const transactions = ref([]);
   const categoriesAll = ref([]);
-  const isRecentTransactionsOpen = ref(true); // or whatever logic you use to toggle this
+  const isRecentTransactionsOpen = ref(true); 
   const selectedTransactionId = ref(null);
   
   const toggleTransactionDetails = (transactionId) => {
@@ -70,7 +66,7 @@
   const groupedTransactionsByDate = computed(() => {
     const grouped = {};
     transactions.value.forEach((transaction) => {
-      const date = transaction.date.split('T')[0]; // Assuming 'date' is in ISO format
+      const date = transaction.date.split('T')[0]; 
       if (!grouped[date]) {
         grouped[date] = [];
       }
@@ -80,14 +76,14 @@
   });
   
   const formatDate = (date) => {
-    // Format date as needed
+
     return new Date(date).toLocaleDateString();
   };
   </script>
   
   <style scoped>
   .recent-transactions {
-    /* your styles here */
+    
   }
   
   .transaction-date-group {

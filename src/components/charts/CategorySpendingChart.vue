@@ -10,12 +10,6 @@
           <Bar :dataKeys="['category', 'totalSpent']" />
         </template>
       </Chart>
-      <!-- <div class="top-categories">
-        <h3>Top 5 Spending Categories</h3>
-        <ul>
-          <li v-for="(item, index) in topCategories" :key="index">{{ item.category }}: {{ item.totalSpent }}</li>
-        </ul>
-      </div> -->
     </div>
   </template>
   
@@ -38,12 +32,8 @@ const fetchCategoryData = async () => {
       ...item,
       totalSpent: parseFloat(item.totalSpent)
     }));
-
-    // Sort the data from highest to lowest spending
     categoryData.value = data.sort((a, b) => b.totalSpent - a.totalSpent);
-
     topCategories.value = response.data.topCategories;
-
     } catch (error) {
         console.error('Error fetching category spending data:', error);
     }

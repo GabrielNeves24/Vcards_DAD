@@ -18,8 +18,6 @@
   try {
     const response = await axios.get("/vcards/"+ userStore.userId  +"/transactions/last30days");
     const transactions = response.data.data;
-
-    // Process the transactions to get the data for the chart
     let chartLabels = [];
     let chartValues = [];
 
@@ -28,21 +26,17 @@
       let value = parseFloat(transaction.value);
 
       if (transaction.type === 'D') {
-        value = -value; // If it's a debit, make the value negative
+        value = -value; 
       }
 
       if (chartLabels.includes(date)) {
-        // If the date is already in the labels, add the value to existing value
         let index = chartLabels.indexOf(date);
         chartValues[index] += value;
       } else {
-        // If it's a new date, add it to the labels and values
         chartLabels.push(date);
         chartValues.push(value);
       }
     });
-
-    // Update the chart data
     chartData.value = {
       labels: chartLabels,
       datasets: [

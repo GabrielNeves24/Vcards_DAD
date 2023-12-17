@@ -8,7 +8,6 @@
       <template #layers>
         <Grid strokeDasharray="2,2" />
         <Bar :dataKeys="['paymentType', 'total']">
-          <!-- Assuming Label is a component provided by vue3-charts -->
           <Label v-slot="{ datum }">{{ datum.total }}</Label>
         </Bar>
       </template>

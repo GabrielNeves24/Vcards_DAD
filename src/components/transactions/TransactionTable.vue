@@ -3,7 +3,6 @@ import axios from 'axios'
 import { useToast } from "vue-toastification"
 import { ref, watch, computed } from "vue"
 import { useUserStore } from '../../stores/user';
-//const toast = useToast()
 const userStore = useUserStore()
 const props = defineProps({
   transactions: {
@@ -71,7 +70,7 @@ const editClick = (transaction) => {
 
         <th>New Balance</th>
         <th>Old Balance</th>
-        <th v-if="showEditButton"></th>
+        <th v-show="userStore.userType =='V'"></th>
       </tr>
     </thead>
     <tbody>
@@ -90,7 +89,7 @@ const editClick = (transaction) => {
         
         <td 
           class="text-end"
-          v-if="showEditButton">
+          v-show="userStore.userType =='V'">
           <div class="d-flex justify-content-end">
             <button
               class="btn btn-xs btn-light"
@@ -138,7 +137,7 @@ const editClick = (transaction) => {
   background-color: #f4f7fa;
 }
 
-/* Responsive table */
+
 @media screen and (max-width: 768px) {
   .table {
     display: block;
@@ -147,9 +146,9 @@ const editClick = (transaction) => {
   }
 }
 
-/* Style for edit button */
+
 .btn {
-  background-color: #3498db; /* Adjust the color to match dashboard theme */
+  background-color: #3498db; 
   color: #fff;
   border: none;
   padding: 5px 10px;
@@ -168,24 +167,23 @@ const editClick = (transaction) => {
 }
 
 .bi-pencil {
-  /* If you're using Bootstrap Icons */
   display: inline-block;
   font-size: 0.8rem;
   vertical-align: middle;
 }
 
-/* Style for completed tasks */
+
 .completed {
   color: #95a5a6;
   text-decoration: line-through;
 }
 
-/* Additional styles for buttons */
+
 button {
   margin: 0 5px;
 }
 
-/* Hover styles for interactivity */
+
 button:hover {
   opacity: 0.8;
 }

@@ -4,20 +4,11 @@ import { ref, inject, onMounted } from 'vue'
 const props = defineProps({
   user: Object
 })
-
-//const projects = inject('projects')
-
-
-
 const editUser = ref(Object.assign({}, props.user))
 
 const inputDescription = ref(null)
-const showErrors = ref(false) // just for testing the errors presentation/layout
-
-
-
+const showErrors = ref(false) 
 onMounted(() => {
-  // Initializing with the focus on the input
   inputDescription.value.focus()
 })
 
@@ -36,7 +27,7 @@ onMounted(() => {
 
 <style scoped>
 .larger-image {
-  max-width: 150px; /* or whatever size you prefer */
+  max-width: 150px; 
   height: auto;
 }
 

@@ -126,7 +126,6 @@ const userStore = useUserStore()
     try {
       const response = await axios.get('vcards/'+ userStore.userId +'/categories/debit')
       categories.value = response.data.data
-      //add 1 category empty, and send with no value
       categories.value.push({id: null, name: null})
       console.log(response.data.data);
     } catch (error) {
@@ -148,12 +147,8 @@ const userStore = useUserStore()
   const vcardsNumbers = ref([])
   const fetchVcardsNumbers = async () => {
     try {
-      const response = await axios.get('vcards')
-      //get only vcards numbers and not blocked 1 or 0
-      
+      const response = await axios.get('vcards')      
       vcardsNumbers.value = response.data.data.filter(vcard => vcard.blocked == 0)
-
-
       console.log(vcardsNumbers.value);
     } catch (error) {
       toast.error('Error fetching categories!')
@@ -166,17 +161,17 @@ const userStore = useUserStore()
 
   switch (type) {
     case 'VCARD':
-      return /^\d{9}$/.test(ref) && ref.startsWith('9'); // 9 digits, starts with 9
+      return /^\d{9}$/.test(ref) && ref.startsWith('9'); 
     case 'MBWAY':
-      return /^\d{9}$/.test(ref) && ref.startsWith('9'); // 9 digits, starts with 9
+      return /^\d{9}$/.test(ref) && ref.startsWith('9'); 
     case 'PAYPAL':
-      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ref); // valid email format
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ref); 
     case 'IBAN':
-      return /^[A-Z]{2}\d{23}$/.test(ref); // 2 letters followed by 23 digits
+      return /^[A-Z]{2}\d{23}$/.test(ref); 
     case 'MB':
-      return /^\d{5}-\d{9}$/.test(ref); // 5 digits, hyphen, 9 digits
+      return /^\d{5}-\d{9}$/.test(ref); 
     case 'VISA':
-      return /^\d{16}$/.test(ref) && ref.startsWith('4'); // 16 digits, starts with 4
+      return /^\d{16}$/.test(ref) && ref.startsWith('4'); 
     default:
       return false;
   }

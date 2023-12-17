@@ -5,24 +5,17 @@ import axios from 'axios'
 import { useToast } from "vue-toastification"
 import { useRouter } from 'vue-router'
 import { useUserStore } from '../stores/user.js'
-//import RecentTransactions from '../components/transactions/RecentTransactions.vue';
-//import SpendingChart from '../components/transactions/SpendingChart.vue'
 import MonthlyTransactionsChart from './charts/MonthlyTransactionsChart.vue'
 import DailyTransactionsChart from './charts/DailyTransactionsChart.vue'
 import PaymentTypeChart from './charts/PaymentTypeChart.vue'
 import PaymentTypeChartCredit from './charts/PaymentTypeChartCredit.vue'
 
-
 const toast = useToast()
 const router = useRouter()
 const userStore = useUserStore()
-
-
 const vcards = ref(null)
 const transactions = ref(null)
 const errors = ref(null)
-
-
 const numberOfVcards = computed(() => {
   if (!vcards.value) {
     return 0
@@ -56,10 +49,9 @@ const totalBalance = computed(() => {
     return 0;
   }
   return vcards.value.reduce((acc, vcard) => {
-    // Convert balance to a float before adding it to the accumulator
     const balance = parseFloat(vcard.balance) || 0;
     return acc + balance;
-  }, 0).toFixed(2); // You can adjust the number of decimal places if needed
+  }, 0).toFixed(2); 
 });
 
 const today = new Date();
@@ -70,15 +62,14 @@ const sumOfDebitTransactionsToday = computed(() => {
     return 0;
   }
   return transactions.value.reduce((acc, transaction) => {
-    const transactionDate = new Date(transaction.date); // Assuming 'date' is the date property
+    const transactionDate = new Date(transaction.date); 
     transactionDate.setHours(0, 0, 0, 0);
 
     if (transactionDate.getTime() === today.getTime() && transaction.type === 'D') {
-      // Assuming 'amount' is the property name that holds the transaction amount
       return acc + parseFloat(transaction.value);
     }
     return acc;
-  }, 0).toFixed(2); // Formatting the result to two decimal places
+  }, 0).toFixed(2);
 });
 
 const sumOfCreditTransactionsToday = computed(() => {
@@ -86,15 +77,14 @@ const sumOfCreditTransactionsToday = computed(() => {
     return 0;
   }
   return transactions.value.reduce((acc, transaction) => {
-    const transactionDate = new Date(transaction.date); // Assuming 'date' is the date property
+    const transactionDate = new Date(transaction.date); 
     transactionDate.setHours(0, 0, 0, 0);
 
     if (transactionDate.getTime() === today.getTime() && transaction.type === 'C') {
-      // Assuming 'amount' is the property name that holds the transaction amount
       return acc + parseFloat(transaction.value);
     }
     return acc;
-  }, 0).toFixed(2); // Formatting the result to two decimal places
+  }, 0).toFixed(2); 
 });
 
 const sumOfTransactionsToday = computed(() => {
@@ -102,15 +92,14 @@ const sumOfTransactionsToday = computed(() => {
     return 0;
   }
   return transactions.value.reduce((acc, transaction) => {
-    const transactionDate = new Date(transaction.date); // Assuming 'date' is the date property
+    const transactionDate = new Date(transaction.date); 
     transactionDate.setHours(0, 0, 0, 0);
 
     if (transactionDate.getTime() === today.getTime()) {
-      // Assuming 'amount' is the property name that holds the transaction amount
       return acc + parseFloat(transaction.value);
     }
     return acc;
-  }, 0).toFixed(2); // Formatting the result to two decimal places
+  }, 0).toFixed(2); 
 });
 
 
@@ -119,9 +108,9 @@ const loadTransactions = async () => {
   try {
     const response = await axios.get('transactions')
     transactions.value = response.data.data
-    //console.log(numberOfTransactions.value)
+
   } catch (error) {
-    errors.value = "Failed to load data"; // Set error message
+    errors.value = "Failed to load data"; 
     console.log(error)
   }
 }
@@ -132,7 +121,7 @@ const loadVcard = async () => {
     vcards.value = response.data.data
     console.log(vcards.value)
   } catch (error) {
-    errors.value = "Failed to load data"; // Set error message
+    errors.value = "Failed to load data"; 
     console.log(error)
   }
 }
@@ -148,7 +137,6 @@ onMounted(() => {
 
 <template>
   <section class="dashboard-content">
-    <!-- Computed Vcard Info -->
     <div class="vcard-stats">
       <div class="info-box">
         <span class="info-title">Total Vcards</span>
@@ -187,7 +175,6 @@ onMounted(() => {
     </div>
 
 
-    <!-- Charts Side by Side -->
     <div class="charts-container">
       <div class="chart">
         <h3 class="section-title">Numero Transações Mensais</h3>
@@ -209,7 +196,6 @@ onMounted(() => {
       </div>
     </div>
 
-    <!-- Remaining sections... -->
   </section>
 </template>
 
