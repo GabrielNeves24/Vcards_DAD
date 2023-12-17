@@ -69,8 +69,8 @@ const editClick = (transaction) => {
         <th>Categoria</th>
         <th>Descrição</th>
 
+        <th>New Balance</th>
         <th>Old Balance</th>
-        <th>new Balance</th>
         <th v-if="showEditButton"></th>
       </tr>
     </thead>

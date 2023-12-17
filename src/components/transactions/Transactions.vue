@@ -123,10 +123,10 @@ const filteredTransactions = computed(() => {
 
   // Filter by date
   if (filterByDate.value != null) {
-    const selectedDate = new Date(filterByDate.value);
+    const selectedDatetime = new Date(filterByDate.value);
     filtered = filtered.filter(t => {
-      const transactionDate = new Date(t.date);
-      return transactionDate >= selectedDate;
+      const transactionDatetime = new Date(t.datetime); // Assuming 'datetime' is the field name
+      return transactionDatetime >= selectedDatetime;
     });
   }
 
@@ -137,8 +137,10 @@ const filteredTransactions = computed(() => {
 
   // Sorting
   filtered = filtered.sort((a, b) => {
+    const datetimeA = new Date(a.datetime); // Assuming 'datetime' is the field name
+    const datetimeB = new Date(b.datetime);
     if (sortBy.value === 'date') {
-      return sortOrder.value === 'asc' ? new Date(a.date) - new Date(b.date) : new Date(b.date) - new Date(a.date);
+      return sortOrder.value === 'asc' ? datetimeA - datetimeB : datetimeB - datetimeA;
     } else if (sortBy.value === 'description') {
       return sortOrder.value === 'asc' ? a.description.localeCompare(b.description) : b.description.localeCompare(a.description);
     }
@@ -148,7 +150,7 @@ const filteredTransactions = computed(() => {
   const totalFiltered = filtered.length;
   const start = (currentPage.value - 1) * itemsPerPage;
   const end = Math.min(start + itemsPerPage, totalFiltered);
-  return filtered.slice(start, end);
+  return filtered.slice(start, end);  
 });
 
 const totalPageCount = computed(() => {

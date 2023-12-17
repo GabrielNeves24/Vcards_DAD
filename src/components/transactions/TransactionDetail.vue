@@ -69,6 +69,26 @@ const userStore = useUserStore()
       toast.error('Referencia inválida');
       return;
   }
+  if (editingTransaction.value.type == 'MBWAY' && editingTransaction.value.value > 50){
+    toast.error('Valor maximo MBWAY 50€');
+    return;
+  }
+  if (editingTransaction.value.type == 'PAYPAL' && editingTransaction.value.value > 100){
+    toast.error('Valor maximo PAYPAL 100€');
+    return;
+  }
+  if (editingTransaction.value.type == 'IBAN' && editingTransaction.value.value > 1000){
+    toast.error('Valor maximo IBAN 1000€');
+    return;
+  }
+  if (editingTransaction.value.type == 'MB' && editingTransaction.value.value > 500){
+    toast.error('Valor maximo MB 500€');
+    return;
+  }
+  if (editingTransaction.value.type == 'VISA' && editingTransaction.value.value > 200){
+    toast.error('Valor maximo VISA 200€');
+    return;
+  }
   if (userStore.userType === 'V' && editingTransaction.value.id == null) {
     if (editingTransaction.value.value <= 0 )
     {

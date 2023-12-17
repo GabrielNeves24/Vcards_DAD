@@ -70,7 +70,7 @@ const deletedVcard =async  (deletedVcard) => {
         // delete from the API
         const responseDelete = await axios.delete(`/vcards/${deletedVcard.phone_number}`, deletedVcard);
         console.log(responseDelete.data.data)
-
+        socket.emit("deleteUser", deletedVcard.phone_number);
 
         // delete from the local array
         // Show a success alert

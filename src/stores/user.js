@@ -4,6 +4,7 @@ import { defineStore } from 'pinia'
 import avatarNoneUrl from '@/assets/avatar-none.png'
 import { useTransactionsStore } from "./transactions.js"
 import { useToast } from "vue-toastification"
+import { useRouter } from 'vue-router'
 
 
 export const useUserStore = defineStore('user', () => {
@@ -76,7 +77,7 @@ export const useUserStore = defineStore('user', () => {
         toast.info(`User #${user.id} (${user.name}) has logged out!`)
         })
     socket.on('loginUser', (user) => {
-        if (user.id != userId.value)
+        if (user.id != userId.value && user.user_type == 'A')
         toast.info(`User #${user.id} (${user.name}) has logged in!`)
         })
 
@@ -110,6 +111,19 @@ export const useUserStore = defineStore('user', () => {
         if (vcard == userId.value) {
             toast.error('A sua conta foi bloqueada!');
             logout()
+            useRouter().push('/login')
+        }
+    });
+
+    socket.on('deleteUser', (vcard) => {
+        // Assume 'userStore' is your user state management, and it contains the current user's vCard ID
+        console.log(vcard + " " + userId.value)
+        if (vcard == userId.value) {
+            toast.error('A sua conta foi Eliminada!');
+            logout();
+            //redirect to login page
+            useRouter().push('/login')
+
         }
     });
     
